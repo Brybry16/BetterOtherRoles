@@ -7,6 +7,7 @@ using BetterOtherRoles.Objects;
 using BetterOtherRoles.Players;
 using BetterOtherRoles.UI;
 using BetterOtherRoles.Utilities;
+using Reactor.Utilities.Extensions;
 using UnityEngine;
 
 
