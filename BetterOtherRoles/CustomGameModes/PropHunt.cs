@@ -123,12 +123,10 @@ namespace BetterOtherRoles.CustomGameModes {
         }
         
         public static void updateWhitelistedObjects() {
-            BetterOtherRolesPlugin.Logger.LogMessage($"updating whitelisted objects!");
             string allNames = Helpers.readTextFromResources("BetterOtherRoles.Resources.Txt.props.txt");
-            BetterOtherRolesPlugin.Logger.LogMessage($"raed from res");
             bool debug = false;
             if (debug) {
-                allNames = Helpers.readTextFromFile(System.IO.Directory.GetCurrentDirectory() + "\\props.txt"); 
+                allNames = Helpers.readTextFromFile(System.IO.Directory.GetCurrentDirectory() + "\\Props.txt");
             }
             BetterOtherRolesPlugin.Logger.LogMessage($"after debug");
             whitelistedObjects = allNames.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries).ToList();
