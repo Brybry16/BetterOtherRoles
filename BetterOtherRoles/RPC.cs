@@ -102,6 +102,7 @@ namespace BetterOtherRoles
         DynamicMapOption,
         SetGameStarting,
         ShareGamemode,
+        StopStart,
 
         // Role functionality
 
@@ -229,18 +230,25 @@ namespace BetterOtherRoles
         public static void shareGamemode(byte gm) {
             TORMapOptions.gameMode = (CustomGamemodes) gm;
         }
+        
+        public static void stopStart(byte playerId) {
+            if (AmongUsClient.Instance.AmHost && CustomOptionHolder.anyPlayerCanStopStart.getBool()) {
+                GameStartManager.Instance.ResetStartState();
+                PlayerControl.LocalPlayer.RpcSendChat($"{Helpers.playerById(playerId).Data.PlayerName} stopped the game start!");
+            }
+        }
 
         public static void workaroundSetRoles(byte numberOfRoles, MessageReader reader)
         {
-                for (int i = 0; i < numberOfRoles; i++)
-                {                   
-                    byte playerId = (byte) reader.ReadPackedUInt32();
-                    byte roleId = (byte) reader.ReadPackedUInt32();
-                    try {
-                        setRole(roleId, playerId);
-                    } catch (Exception e) {
-                        BetterOtherRolesPlugin.Logger.LogError("Error while deserializing roles: " + e.Message);
-                    }
+            for (int i = 0; i < numberOfRoles; i++)
+            {                   
+                byte playerId = (byte) reader.ReadPackedUInt32();
+                byte roleId = (byte) reader.ReadPackedUInt32();
+                try {
+                    setRole(roleId, playerId);
+                } catch (Exception e) {
+                    BetterOtherRolesPlugin.Logger.LogError("Error while deserializing roles: " + e.Message);
+                }
             }
             
         }
@@ -389,7 +397,12 @@ namespace BetterOtherRoles
                         StickyBomber.Player = player;
                         break;
                     }
-                }
+                    
+                    if (AmongUsClient.Instance.AmHost && Helpers.roleCanUseVents(player) && !player.Data.Role.IsImpostor) {
+                        player.RpcSetRole(RoleTypes.Engineer);
+                        player.SetRole(RoleTypes.Engineer);
+                    } 
+                } 
         }
 
         public static void setModifier(byte modifierId, byte playerId, byte flag) {
@@ -682,6 +695,8 @@ namespace BetterOtherRoles
                 Sidekick.wasSpy = wasSpy;
                 Sidekick.wasImpostor = wasImpostor;
                 if (player == CachedPlayer.LocalPlayer.PlayerControl) SoundEffectsManager.play("jackalSidekick");
+                if (HandleGuesser.isGuesserGm && CustomOptionHolder.guesserGamemodeSidekickIsAlwaysGuesser.getBool() && !HandleGuesser.isGuesser(targetId))
+                    setGuesserGm(targetId);
             }
             Jackal.canCreateSidekick = false;
         }
@@ -926,7 +941,7 @@ namespace BetterOtherRoles
         public static void arsonistWin() {
             Arsonist.triggerArsonistWin = true;
             foreach (PlayerControl p in CachedPlayer.AllPlayers) {
-                if (p != Arsonist.arsonist) {
+                if (p != Arsonist.arsonist && !p.Data.IsDead) {
                     p.Exiled();
                     overrideDeathReasonAndKiller(p, DeadPlayer.CustomDeathReason.Arson, Arsonist.arsonist);
                 }
@@ -1068,6 +1083,8 @@ namespace BetterOtherRoles
             if (target == Sidekick.sidekick) {
                 Sidekick.sidekick = thief;
                 Jackal.formerJackals.Add(target);
+                if (HandleGuesser.isGuesserGm && CustomOptionHolder.guesserGamemodeSidekickIsAlwaysGuesser.getBool() && !HandleGuesser.isGuesser(thief.PlayerId))
+                    setGuesserGm(thief.PlayerId);
             }
             if (target == Guesser.evilGuesser) Guesser.evilGuesser = thief;
             if (target == Godfather.godfather) Godfather.godfather = thief;
@@ -1516,6 +1533,10 @@ namespace BetterOtherRoles
                 case (byte)CustomRPC.ShareGamemode:
                     byte gm = reader.ReadByte();
                     RPCProcedure.shareGamemode(gm);
+                    break;
+                
+                case (byte)CustomRPC.StopStart:
+                    RPCProcedure.stopStart(reader.ReadByte());
                     break;
 
                 // Game mode

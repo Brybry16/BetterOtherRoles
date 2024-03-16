@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text.Json;
 using BepInEx.Unity.IL2CPP.Utils;
+using BetterOtherRoles.Utilities;
 using UnityEngine;
 using UnityEngine.Networking;
 using static BetterOtherRoles.Modules.CustomHats.CustomHatManager;
@@ -50,6 +51,7 @@ public class HatsLoader : MonoBehaviour
 
         UnregisteredHats.AddRange(SanitizeHats(response));
         var toDownload = GenerateDownloadList(UnregisteredHats);
+        if (EventUtility.isEnabled) UnregisteredHats.AddRange(CustomHatManager.loadHorseHats());
         
         BetterOtherRolesPlugin.Logger.LogMessage($"I'll download {toDownload.Count} hat files");
 

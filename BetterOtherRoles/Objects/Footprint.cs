@@ -1,20 +1,22 @@
+using InnerNet;
+using Reactor.Utilities.Extensions;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using BetterOtherRoles.Utilities;
+using System.Linq;
+using BetterOtherRoles.Players;
 using UnityEngine;
+using static BetterOtherRoles.BetterOtherRoles;
 
 namespace BetterOtherRoles.Objects 
 {
-    public class FootprintHolder : MonoBehaviour
-    {
+    public class FootprintHolder : MonoBehaviour {
         static FootprintHolder() => ClassInjector.RegisterTypeInIl2Cpp<FootprintHolder>();
 
         public FootprintHolder(IntPtr ptr) : base(ptr) { }
 
         private static FootprintHolder _instance;
-        public static FootprintHolder Instance
-        {
+        public static FootprintHolder Instance {
             get => _instance ? _instance : _instance = new GameObject("FootprintHolder").AddComponent<FootprintHolder>();
             set => _instance = value;
 
@@ -26,8 +28,7 @@ namespace BetterOtherRoles.Objects
         private static bool AnonymousFootprints => BetterOtherRoles.Detective.anonymousFootprints;
         private static float FootprintDuration => BetterOtherRoles.Detective.footprintDuration;
         
-        private class Footprint
-        {
+        private class Footprint {
             public GameObject GameObject;
             public Transform Transform;
             public SpriteRenderer Renderer;
@@ -53,10 +54,8 @@ namespace BetterOtherRoles.Objects
         private readonly List<Footprint> _toRemove = new();
         
         [HideFromIl2Cpp]
-        public void MakeFootprint(PlayerControl player)
-        {
-            if (!_pool.TryTake(out var print))
-            {
+        public void MakeFootprint(PlayerControl player) {
+            if (!_pool.TryTake(out var print)) {
                 print = new();
             }
 
@@ -71,23 +70,25 @@ namespace BetterOtherRoles.Objects
             _activeFootprints.Add(print);
         }
 
-        private void Update()
-        {
-            var dt = Time.deltaTime;
+        private static float updateDt = 0.10f;
+
+        private void Start() {
+            InvokeRepeating(nameof(FootprintUpdate), updateDt, updateDt);
+        }
+
+        private void FootprintUpdate() {
+            var dt = updateDt;
             _toRemove.Clear();
-            foreach (var activeFootprint in _activeFootprints)
-            {
+            foreach (var activeFootprint in _activeFootprints) {
                 var p = activeFootprint.Lifetime / FootprintDuration;
                 
-                if (activeFootprint.Lifetime <= 0)
-                {
+                if (activeFootprint.Lifetime <= 0) {
                     _toRemove.Add(activeFootprint);
                     continue;
                 }
                 
                 Color color;
-                if (AnonymousFootprints || Camouflager.camouflageTimer > 0 || Helpers.MushroomSabotageActive())
-                {
+                if (AnonymousFootprints || Camouflager.camouflageTimer > 0 || Helpers.MushroomSabotageActive()) {
                     color = Palette.PlayerColors[6];
                 }
                 else if (activeFootprint.Owner == Morphling.morphling && Morphling.morphTimer > 0 && Morphling.morphTarget && Morphling.morphTarget.Data != null)

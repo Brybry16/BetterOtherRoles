@@ -168,7 +168,7 @@ public class CustomOption
         vanillaSettings.Value =
             Convert.ToBase64String(
                 GameOptionsManager.Instance.gameOptionsFactory.ToBytes(GameManager.Instance.LogicOptions
-                    .currentGameOptions));
+                    .currentGameOptions, false));
     }
 
     public static void loadVanillaOptions()

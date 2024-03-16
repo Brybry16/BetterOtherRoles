@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using BetterOtherRoles.Modules.CustomHats.Extensions;
 using HarmonyLib;
 using PowerTools;
 using UnityEngine;
@@ -23,7 +24,7 @@ internal static class HatParentPatches
     private static bool SetHatPrefix(HatParent __instance, HatData hat, int color)
     {
         if (SetCustomHat(__instance)) return true;
-        __instance.PopulateFromHatViewData();
+        __instance.PopulateFromViewData();
         __instance.SetMaterialColor(color);
         return false;
     }
@@ -33,8 +34,8 @@ internal static class HatParentPatches
     private static bool SetHatPrefix(HatParent __instance, int color)
     {
         if (!__instance.IsCached()) return true;
-        __instance.hatDataAsset = null;
-        __instance.PopulateFromHatViewData();
+        __instance.viewAsset = null;
+        __instance.PopulateFromViewData();
         __instance.SetMaterialColor(color);
         return false;
     }
@@ -44,12 +45,13 @@ internal static class HatParentPatches
     private static bool UpdateMaterialPrefix(HatParent __instance)
     {
         if (!__instance.TryGetCached(out var asset)) return true;
-        if (asset && asset.AltShader)
+        var extend = HatDataExtensions.GetHatExtension(__instance.Hat);
+        if (asset && extend != null && extend.Adaptive)
         {
-            __instance.FrontLayer.sharedMaterial = asset.AltShader;
+            __instance.FrontLayer.sharedMaterial = DestroyableSingleton<HatManager>.Instance.PlayerMaterial;
             if (__instance.BackLayer)
             {
-                __instance.BackLayer.sharedMaterial = asset.AltShader;
+                __instance.BackLayer.sharedMaterial = DestroyableSingleton<HatManager>.Instance.PlayerMaterial;
             }
         }
         else
@@ -184,8 +186,8 @@ internal static class HatParentPatches
     {
         if (!__instance.Hat) return false;
         if (!__instance.IsCached()) return true;
-        __instance.hatDataAsset = null;
-        __instance.PopulateFromHatViewData();
+        __instance.viewAsset = null;
+        __instance.PopulateFromViewData();
         __instance.SetMaterialColor(colorId);
         return false;
     }
@@ -202,7 +204,7 @@ internal static class HatParentPatches
         return false;
     }
 
-    [HarmonyPatch(nameof(HatParent.PopulateFromHatViewData))]
+    [HarmonyPatch(nameof(HatParent.PopulateFromViewData))]
     [HarmonyPrefix]
     private static bool PopulateFromHatViewDataPrefix(HatParent __instance)
     {
