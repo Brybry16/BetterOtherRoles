@@ -122,15 +122,7 @@ namespace BetterOtherRoles.CustomGameModes {
             return Helpers.loadSpriteFromResources($"BetterOtherRoles.Resources.IntroAnimation.intro_{index + 1000}.png", 150f, cache: false);
         }
 
-        public static void update() {
-            
-            if (!isPropHuntGM) {
-                // Make sure the DangerMeter is not displayed in TOR HideNSeek, Classic or Guesser Game mode.
-                if (GameOptionsManager.Instance.currentGameOptions.GameMode != AmongUs.GameOptions.GameModes.HideNSeek) HudManager.Instance.DangerMeter?.gameObject.SetActive(false);
-                return;
-            }
-            if (timerRunning) timer = Math.Clamp(timer -= Time.deltaTime, 0, timer >= 0 ? timer : 0);
-            else if (blackOutTimer > 0f) blackOutTimer -= Time.deltaTime;
+        public static void propTargetAndTimerDisplayUpdate() {
 
             // Local player find prop Target:
             if (!PlayerControl.LocalPlayer.Data.Role.IsImpostor) currentTarget = FindClosestDisguiseObject(PlayerControl.LocalPlayer.gameObject, 1f);
@@ -161,39 +153,64 @@ namespace BetterOtherRoles.CustomGameModes {
                 }
             }
             if (HudManagerStartPatch.propDisguiseButton != null && HudManagerStartPatch.propDisguiseButton.Timer > HudManagerStartPatch.propDisguiseButton.MaxTimer) HudManagerStartPatch.propDisguiseButton.Timer = HudManagerStartPatch.propDisguiseButton.MaxTimer;
-            // poolable players update.
-            if (poolablesBackground == null) {
+        }
+
+        public static void poolablePlayerUpdate()
+        {
+            if (poolablesBackground == null)
+            {
                 poolablesBackground = new GameObject("poolablesBackground");
                 poolablesBackground.AddComponent<SpriteRenderer>();
-                if (poolablesBackgroundSprite == null) poolablesBackgroundSprite = Helpers.loadSpriteFromResources("BetterOtherRoles.Resources.poolablesBackground.jpg", 200f);
+                if (poolablesBackgroundSprite == null)
+                    poolablesBackgroundSprite =
+                        Helpers.loadSpriteFromResources("BetterOtherRoles.Resources.poolablesBackground.jpg", 200f);
             }
+
             poolablesBackground.transform.SetParent(HudManager.Instance.transform);
-            poolablesBackground.transform.localPosition = IntroCutsceneOnDestroyPatch.bottomLeft + new Vector3(-1.45f, -0.05f, 0)  + Vector3.right * PlayerControl.AllPlayerControls.Count * 0.2f;
+            poolablesBackground.transform.localPosition = IntroCutsceneOnDestroyPatch.bottomLeft +
+                                                          new Vector3(-1.45f, -0.05f, 0) + Vector3.right *
+                                                          PlayerControl.AllPlayerControls.Count * 0.2f;
             var backgroundSizeX = PlayerControl.AllPlayerControls.Count * 0.4f + 0.2f;
             poolablesBackground.GetComponent<SpriteRenderer>().sprite = poolablesBackgroundSprite;
-            poolablesBackground.transform.localScale = new Vector3(poolablesBackground.transform.localScale.x * backgroundSizeX / poolablesBackground.GetComponent<SpriteRenderer>().bounds.size.x, poolablesBackground.transform.localScale.y, poolablesBackground.transform.localScale.z);
+            poolablesBackground.transform.localScale = new Vector3(
+                poolablesBackground.transform.localScale.x * backgroundSizeX /
+                poolablesBackground.GetComponent<SpriteRenderer>().bounds.size.x,
+                poolablesBackground.transform.localScale.y, poolablesBackground.transform.localScale.z);
 
-            foreach (var pc in PlayerControl.AllPlayerControls) {
+            foreach (var pc in PlayerControl.AllPlayerControls)
+            {
                 if (!TORMapOptions.playerIcons.ContainsKey(pc.PlayerId)) continue;
                 var poolablePlayer = TORMapOptions.playerIcons[pc.PlayerId];
-                if (pc.Data.IsDead) {
+                if (pc.Data.IsDead)
+                {
                     poolablePlayer.setSemiTransparent(true, 0.25f);
-                    poolablePlayer.cosmetics.nameText.text = Helpers.cs(Palette.DisabledGrey, pc.Data.PlayerName); ;
-                } else if (pc.Data.Role.IsImpostor) {
+                    poolablePlayer.cosmetics.nameText.text = Helpers.cs(Palette.DisabledGrey, pc.Data.PlayerName);
+                    ;
+                }
+                else if (pc.Data.Role.IsImpostor)
+                {
                     poolablePlayer.cosmetics.nameText.text = Helpers.cs(Palette.ImpostorRed, pc.Data.PlayerName);
                     poolablePlayer.cosmetics.currentBodySprite.BodySprite.material.SetFloat("_Outline", 2f);
-                    poolablePlayer.cosmetics.currentBodySprite.BodySprite.material.SetColor("_OutlineColor", Palette.ImpostorRed);
+                    poolablePlayer.cosmetics.currentBodySprite.BodySprite.material.SetColor("_OutlineColor",
+                        Palette.ImpostorRed);
                     poolablePlayer.cosmetics.nameText.fontSize = 4;
-                } else {
+                }
+                else
+                {
                     // Display Prop
-                    poolablePlayer.cosmetics.nameText.text = Helpers.cs(Palette.CrewmateBlue, pc.Data.PlayerName); ;
-                    if (isCurrentlyRevealed.ContainsKey(pc.PlayerId)) {
-                        
+                    poolablePlayer.cosmetics.nameText.text = Helpers.cs(Palette.CrewmateBlue, pc.Data.PlayerName);
+                    ;
+                    if (isCurrentlyRevealed.ContainsKey(pc.PlayerId))
+                    {
+
                     }
                 }
+
                 // update currently revealed:
-                if (isCurrentlyRevealed.ContainsKey(pc.PlayerId)) {
-                    if (!revealRenderer.ContainsKey(pc.PlayerId)) {
+                if (isCurrentlyRevealed.ContainsKey(pc.PlayerId))
+                {
+                    if (!revealRenderer.ContainsKey(pc.PlayerId))
+                    {
                         var go = new GameObject($"reveal_renderer_{pc.PlayerId}");
                         go.AddComponent<SpriteRenderer>();
                         go.transform.SetParent(poolablePlayer.transform.parent, false);
@@ -202,15 +219,22 @@ namespace BetterOtherRoles.CustomGameModes {
                         poolablePlayer.gameObject.SetActive(false);
                         revealRenderer.Add(pc.PlayerId, go);
                     }
+
                     float revealTimer = isCurrentlyRevealed[pc.PlayerId] - Time.deltaTime;
                     isCurrentlyRevealed[pc.PlayerId] = revealTimer;
-                    if (revealTimer > 0) {
+                    if (revealTimer > 0)
+                    {
                         // get sprite:
-                        if (currentObject.ContainsKey(pc.PlayerId)) {
-                            revealRenderer[pc.PlayerId].GetComponent<SpriteRenderer>().sprite = pc.GetComponent<SpriteRenderer>().sprite;
-                            revealRenderer[pc.PlayerId].transform.localScale *= 0.5f / revealRenderer[pc.PlayerId].GetComponent<SpriteRenderer>().bounds.size.magnitude;
+                        if (currentObject.ContainsKey(pc.PlayerId))
+                        {
+                            revealRenderer[pc.PlayerId].GetComponent<SpriteRenderer>().sprite =
+                                pc.GetComponent<SpriteRenderer>().sprite;
+                            revealRenderer[pc.PlayerId].transform.localScale *= 0.5f / revealRenderer[pc.PlayerId]
+                                .GetComponent<SpriteRenderer>().bounds.size.magnitude;
                         }
-                    } else {
+                    }
+                    else
+                    {
                         revealRenderer[pc.PlayerId].Destroy();
                         isCurrentlyRevealed.Remove(pc.PlayerId);
                         revealRenderer.Remove(pc.PlayerId);
@@ -219,25 +243,18 @@ namespace BetterOtherRoles.CustomGameModes {
                     }
                 }
             }
+        }
 
-            // speedboost
-            foreach (var key in speedboostActive.Keys) {
-                float speedboostTimer = speedboostActive[key] - Time.deltaTime;
-                speedboostActive[key] = speedboostTimer;
-                if (speedboostTimer < 0)
-                    speedboostActive.Remove(key);
-            }
-            // invisupdate
+        public static void invisUpdate() {
             foreach (var playerId in invisPlayers.Keys) {
                 var pc = Helpers.playerById(playerId);
                 if (pc == null || pc.Data.IsDead) continue;
                 float timeLeft = invisPlayers[playerId] - Time.deltaTime;
                 invisPlayers[playerId] = timeLeft;
                 if (timeLeft > 0) {
-                    pc.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, PlayerControl.LocalPlayer.Data.IsDead || PlayerControl.LocalPlayer.PlayerId == playerId ? 0.1f: 0f);
+                    pc.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, PlayerControl.LocalPlayer.Data.IsDead || PlayerControl.LocalPlayer.PlayerId == playerId ? 0.1f : 0f);
 
-                }
-                else {
+                } else {
                     pc.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 1f);
                     invisPlayers.Remove(playerId);
                 }
@@ -245,8 +262,18 @@ namespace BetterOtherRoles.CustomGameModes {
                     revealRenderer[playerId].GetComponent<SpriteRenderer>().color = pc.GetComponent<SpriteRenderer>().color;
                 }
             }
+        }
 
-            // Update dangerMeter
+        public static void speedboostUpdate() {
+            foreach (var key in speedboostActive.Keys) {
+                float speedboostTimer = speedboostActive[key] - Time.deltaTime;
+                speedboostActive[key] = speedboostTimer;
+                if (speedboostTimer < 0)
+                    speedboostActive.Remove(key);
+            }
+        }
+
+        public static void dangerMeterUpdate() {
             if (HudManager.Instance.DangerMeter.gameObject.active) {
                 float dist = 55f;
                 float dist2 = 15f;
@@ -267,7 +294,28 @@ namespace BetterOtherRoles.CustomGameModes {
             }
             HudManager.Instance.DangerMeter?.gameObject.SetActive(!PlayerControl.LocalPlayer.Data.IsDead && (!PlayerControl.LocalPlayer.Data.Role.IsImpostor || HudManagerStartPatch.propHuntFindButton.isEffectActive));
         }
+        
+        public static void update() {            
+            if (!isPropHuntGM) {
+                // Make sure the DangerMeter is not displayed in TOR HideNSeek, Classic or Guesser Game mode.
+                if (GameOptionsManager.Instance.currentGameOptions.GameMode != AmongUs.GameOptions.GameModes.HideNSeek) HudManager.Instance.DangerMeter?.gameObject.SetActive(false);
+                return;
+            }
+            if (timerRunning) timer = Math.Clamp(timer -= Time.deltaTime, 0, timer >= 0 ? timer : 0);
+            else if (blackOutTimer > 0f) blackOutTimer -= Time.deltaTime;
 
+            // Local player find prop Target
+            propTargetAndTimerDisplayUpdate();
+
+            poolablePlayerUpdate();
+
+            speedboostUpdate();
+
+            invisUpdate();
+
+            dangerMeterUpdate();
+        }
+        
         public static void transformLayers() {  // A bit of a hacky way to make sure that props as well as propable objects are not visible in the dark, while keeping collisions enabled.
             PlayerControl.LocalPlayer.clearAllTasks();
             foreach (Collider2D collider in Physics2D.OverlapCircleAll(PlayerControl.LocalPlayer.transform.position, 500)) {
