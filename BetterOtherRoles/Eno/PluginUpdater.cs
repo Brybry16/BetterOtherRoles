@@ -16,7 +16,7 @@ namespace BetterOtherRoles.Eno;
 
 public class PluginUpdater : MonoBehaviour
 {
-    public const string RepositoryOwner = "EnoPM";
+    public const string RepositoryOwner = "Brybry16";
     public const string RepositoryName = "BetterOtherRoles";
     public static PluginUpdater Instance { get; private set; }
     
