@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using AmongUs.GameOptions;
+using BepInEx.Unity.IL2CPP;
+using BepInEx;
 using BepInEx.Configuration;
 using BetterOtherRoles.Players;
 using BetterOtherRoles.UI;
@@ -11,6 +13,7 @@ using BetterOtherRoles.Utilities;
 using HarmonyLib;
 using Hazel;
 using UnityEngine;
+using static ShipStatus;
 using static BetterOtherRoles.BetterOtherRoles;
 using static BetterOtherRoles.Modules.CustomOption;
 
@@ -27,7 +30,8 @@ public class CustomOption
         Modifier,
         Guesser,
         HideNSeekMain,
-        HideNSeekRoles
+        HideNSeekRoles,
+        PropHunt,
     }
 
     public enum ValueType
@@ -52,6 +56,7 @@ public class CustomOption
     public CustomOption parent;
     public bool isHeader;
     public CustomOptionType type;
+    public Action onChange = null;
     public string suffix;
     public ValueType valueType;
 
@@ -88,7 +93,7 @@ public class CustomOption
     // Option creation
 
     public CustomOption(int id, CustomOptionType type, string name, System.Object[] selections,
-        System.Object defaultValue, CustomOption parent, bool isHeader, string suffix, ValueType valueType)
+        System.Object defaultValue, CustomOption parent, bool isHeader, string suffix, ValueType valueType, Action onChange = null)
     {
         this.id = id;
         this.name = parent == null ? name : "- " + name;
@@ -99,6 +104,7 @@ public class CustomOption
         this.isHeader = isHeader;
         this.type = type;
         selection = 0;
+        this.onChange = onChange;
         this.suffix = suffix;
         this.valueType = valueType;
         if (id != 0)
@@ -111,26 +117,26 @@ public class CustomOption
     }
 
     public static CustomOption Create(int id, CustomOptionType type, string name, string[] selections,
-        CustomOption parent = null, bool isHeader = false, string suffix = "")
+        CustomOption parent = null, bool isHeader = false, string suffix = "", Action onChange = null)
     {
-        return new CustomOption(id, type, name, selections, "", parent, isHeader, suffix, ValueType.String);
+        return new CustomOption(id, type, name, selections, "", parent, isHeader, suffix, ValueType.String, onChange);
     }
 
     public static CustomOption Create(int id, CustomOptionType type, string name, float defaultValue, float min,
-        float max, float step, CustomOption parent = null, bool isHeader = false, string suffix = "")
+        float max, float step, CustomOption parent = null, bool isHeader = false, string suffix = "", Action onChange = null)
     {
         List<object> selections = new();
         for (float s = min; s <= max; s += step)
             selections.Add(s);
         return new CustomOption(id, type, name, selections.ToArray(), defaultValue, parent, isHeader, suffix,
-            ValueType.Float);
+            ValueType.Float, onChange);
     }
 
     public static CustomOption Create(int id, CustomOptionType type, string name, bool defaultValue,
-        CustomOption parent = null, bool isHeader = false, string suffix = "")
+        CustomOption parent = null, bool isHeader = false, string suffix = "", Action onChange = null)
     {
         return new CustomOption(id, type, name, new string[] { "Off", "On" }, defaultValue ? "On" : "Off", parent,
-            isHeader, suffix, ValueType.Boolean);
+            isHeader, suffix, ValueType.Boolean, onChange);
     }
 
     // Static behaviour
@@ -238,6 +244,10 @@ public class CustomOption
     public void updateSelection(int newSelection)
     {
         selection = Mathf.Clamp((newSelection + selections.Length) % selections.Length, 0, selections.Length - 1);
+        try
+        {
+            if (onChange != null) onChange();
+        } catch { }
         if (optionBehaviour != null)
         {
             if (optionBehaviour is StringOption stringOption)
@@ -380,6 +390,9 @@ class GameOptionsMenuStartPatch
                 break;
             case CustomGamemodes.HideNSeek:
                 createHideNSeekTabs(__instance);
+                break;
+            case CustomGamemodes.PropHunt:
+                createPropHuntTabs(__instance);
                 break;
         }
 
@@ -853,6 +866,85 @@ class GameOptionsMenuStartPatch
         gameSettingMenu.GameSettingsHightlight.enabled = false;
     }
 
+    private static void createPropHuntTabs(GameOptionsMenu __instance) {
+            bool isReturn = setNames(
+                new Dictionary<string, string>() {
+                    ["TORSettings"] = "Prop Hunt Settings"
+                });
+
+            if (isReturn) return;
+
+            // Setup TOR tab
+            var template = UnityEngine.Object.FindObjectsOfType<StringOption>().FirstOrDefault();
+            if (template == null) return;
+            var gameSettings = GameObject.Find("Game Settings");
+            var gameSettingMenu = UnityEngine.Object.FindObjectsOfType<GameSettingMenu>().FirstOrDefault();
+
+            var torSettings = UnityEngine.Object.Instantiate(gameSettings, gameSettings.transform.parent);
+            var torMenu = getMenu(torSettings, "TORSettings");
+            var roleTab = GameObject.Find("RoleTab");
+            var gameTab = GameObject.Find("GameTab");
+
+            var torTab = UnityEngine.Object.Instantiate(roleTab, gameTab.transform.parent);
+            var torTabHighlight = getTabHighlight(torTab, "TheOtherRolesTab", "BetterOtherRoles.Resources.TabIconPropHuntSettings.png");
+
+            roleTab.active = false;
+            gameTab.active = false;
+
+            // Position of Tab Icons
+            torTab.transform.position += Vector3.left * 3f;
+
+            var tabs = new GameObject[] {torTab};
+            var settingsHighlightMap = new Dictionary<GameObject, SpriteRenderer> {
+                [torSettings.gameObject] = torTabHighlight
+            };
+            for (int i = 0; i < tabs.Length; i++) {
+                var button = tabs[i].GetComponentInChildren<PassiveButton>();
+                if (button == null) continue;
+                int copiedIndex = i;
+                button.OnClick = new UnityEngine.UI.Button.ButtonClickedEvent();
+                button.OnClick.AddListener((System.Action)(() => {
+                    setListener(settingsHighlightMap, copiedIndex);
+                }));
+            }
+
+            destroyOptions(new List<List<OptionBehaviour>>{
+                torMenu.GetComponentsInChildren<OptionBehaviour>().ToList(),
+            });
+
+            List<OptionBehaviour> torOptions = new List<OptionBehaviour>();
+
+            List<Transform> menus = new List<Transform>() { torMenu.transform };
+            List<List<OptionBehaviour>> optionBehaviours = new List<List<OptionBehaviour>>() { torOptions };
+
+            for (int i = 0; i < CustomOption.options.Count; i++) {
+                CustomOption option = CustomOption.options[i];
+                if (option.type != CustomOptionType.PropHunt) continue;
+                if (option.optionBehaviour == null) {
+                    int index = 0;
+                    StringOption stringOption = UnityEngine.Object.Instantiate(template, menus[index]);
+                    optionBehaviours[index].Add(stringOption);
+                    stringOption.OnValueChanged = new Action<OptionBehaviour>((o) => { });
+                    stringOption.TitleText.text = option.name;
+                    stringOption.Value = stringOption.oldValue = option.selection;
+                    stringOption.ValueText.text = option.selections[option.selection].ToString();
+
+                    option.optionBehaviour = stringOption;
+                }
+                option.optionBehaviour.gameObject.SetActive(true);
+            }
+
+            setOptions(
+                new List<GameOptionsMenu> { torMenu},
+                new List<List<OptionBehaviour>> { torOptions },
+                new List<GameObject> { torSettings }
+            );
+
+            torSettings.gameObject.SetActive(true);
+            torTabHighlight.enabled = true;
+            gameSettingMenu.RegularGameSettings.SetActive(false);
+            gameSettingMenu.GameSettingsHightlight.enabled = false;
+        }
 
     private static void setListener(Dictionary<GameObject, SpriteRenderer> settingsHighlightMap, int index)
     {
@@ -988,6 +1080,12 @@ public class StringOptionIncreasePatch
         CustomOption option = CustomOption.options.FirstOrDefault(option => option.optionBehaviour == __instance);
         if (option == null) return true;
         option.updateSelection(option.selection + 1);
+        if (CustomOptionHolder.isMapSelectionOption(option)) {
+            IGameOptions currentGameOptions = GameOptionsManager.Instance.CurrentGameOptions;
+            currentGameOptions.SetByte(ByteOptionNames.MapId, (byte)option.selection);
+            GameOptionsManager.Instance.GameHostOptions = GameOptionsManager.Instance.CurrentGameOptions;
+            GameManager.Instance.LogicOptions.SyncOptions();
+        }
         return false;
     }
 }
@@ -1000,7 +1098,30 @@ public class StringOptionDecreasePatch
         CustomOption option = CustomOption.options.FirstOrDefault(option => option.optionBehaviour == __instance);
         if (option == null) return true;
         option.updateSelection(option.selection - 1);
+        if (CustomOptionHolder.isMapSelectionOption(option)) {
+            IGameOptions currentGameOptions = GameOptionsManager.Instance.CurrentGameOptions;
+            currentGameOptions.SetByte(ByteOptionNames.MapId, (byte)option.selection);
+            GameOptionsManager.Instance.GameHostOptions = GameOptionsManager.Instance.CurrentGameOptions;
+            GameManager.Instance.LogicOptions.SyncOptions();
+        }
         return false;
+    }
+}
+
+[HarmonyPatch(typeof(StringOption), nameof(StringOption.FixedUpdate))]
+public class StringOptionFixedUpdate {
+    public static void Postfix(StringOption __instance) {
+        if (!IL2CPPChainloader.Instance.Plugins.TryGetValue("com.DigiWorm.LevelImposter", out PluginInfo _)) return;
+        CustomOption option = CustomOption.options.FirstOrDefault(option => option.optionBehaviour == __instance);
+        if (option == null || !CustomOptionHolder.isMapSelectionOption(option)) return;
+        if (GameOptionsManager.Instance.CurrentGameOptions.MapId == 6)
+            if (option.optionBehaviour != null && option.optionBehaviour is StringOption stringOption) {
+                stringOption.ValueText.text = option.selections[option.selection].ToString();
+            }
+            else if (option.optionBehaviour != null && option.optionBehaviour is StringOption stringOptionToo) {
+                stringOptionToo.oldValue = stringOptionToo.Value = option.selection;
+                stringOptionToo.ValueText.text = option.selections[option.selection].ToString();
+            }
     }
 }
 
@@ -1062,8 +1183,7 @@ class GameOptionsMenuUpdatePatch
         float offset = 2.75f;
         foreach (CustomOption option in CustomOption.options)
         {
-            if (GameObject.Find("TORSettings") && option.type != CustomOption.CustomOptionType.General &&
-                option.type != CustomOptionType.HideNSeekMain)
+            if (GameObject.Find("TORSettings") && option.type != CustomOption.CustomOptionType.General && option.type != CustomOptionType.HideNSeekMain && option.type != CustomOptionType.PropHunt)
                 continue;
             if (GameObject.Find("ImpostorSettings") && option.type != CustomOption.CustomOptionType.Impostor)
                 continue;
@@ -1103,10 +1223,6 @@ class GameOptionsMenuUpdatePatch
 [HarmonyPatch]
 class GameOptionsDataPatch
 {
-    /*private static IEnumerable<MethodBase> TargetMethods() {
-        return typeof(IGameOptionsExtensions.).GetMethods().Where(x => x.ReturnType == typeof(string) && x.GetParameters().Length == 1 && x.GetParameters()[0].ParameterType == typeof(int));
-    }*/
-
     private static string buildRoleOptions()
     {
         var impRoles = buildOptionsOfType(CustomOption.CustomOptionType.Impostor, true) + "\n";
@@ -1150,6 +1266,8 @@ class GameOptionsDataPatch
             options = options.Where(x =>
                 (x.type == CustomOption.CustomOptionType.HideNSeekMain ||
                  x.type == CustomOption.CustomOptionType.HideNSeekRoles));
+        else if (TORMapOptions.gameMode == CustomGamemodes.PropHunt)
+            options = options.Where(x => (x.type == CustomOption.CustomOptionType.PropHunt));
 
         foreach (var option in options)
         {
@@ -1177,6 +1295,7 @@ class GameOptionsDataPatch
         {
             if (TORMapOptions.gameMode == CustomGamemodes.HideNSeek && option.type != CustomOptionType.HideNSeekMain &&
                 option.type != CustomOptionType.HideNSeekRoles) continue;
+            if (TORMapOptions.gameMode == CustomGamemodes.PropHunt && option.type != CustomOptionType.PropHunt) continue;
             if (option.parent != null)
             {
                 bool isIrrelevant = option.parent.getSelection() == 0 ||
@@ -1260,6 +1379,7 @@ class GameOptionsDataPatch
         return sb.ToString();
     }
 
+    public static int maxPage = 7;
     public static string buildAllOptions(string vanillaSettings = "", bool hideExtras = false)
     {
         if (vanillaSettings == "")
@@ -1269,7 +1389,7 @@ class GameOptionsDataPatch
         string hudString = counter != 0 && !hideExtras
             ? Helpers.cs(DateTime.Now.Second % 2 == 0 ? Color.white : Color.red, "(Use scroll wheel if necessary)\n\n")
             : "";
-        int maxPage = 7;
+        
         if (TORMapOptions.gameMode == CustomGamemodes.HideNSeek)
         {
             if (BetterOtherRolesPlugin.optionsPage > 1) BetterOtherRolesPlugin.optionsPage = 0;
@@ -1286,8 +1406,20 @@ class GameOptionsDataPatch
                     break;
             }
         }
+        else if (TORMapOptions.gameMode == CustomGamemodes.PropHunt)
+        {
+            maxPage = 1;
+            switch (counter)
+            {
+                case 0:
+                    hudString += "Page 1: Prop Hunt Settings \n\n" +
+                                 buildOptionsOfType(CustomOption.CustomOptionType.PropHunt, false);
+                    break;
+            }
+        }
         else
         {
+            maxPage = 7;
             switch (counter)
             {
                 case 0:
@@ -1384,6 +1516,8 @@ public static class GameOptionsNextPagePatch
         {
             UIManager.CustomOptionsPanel?.Toggle();
         }
+
+        if (BetterOtherRolesPlugin.optionsPage >= GameOptionsDataPatch.maxPage) BetterOtherRolesPlugin.optionsPage = 0;
 
         if (page != BetterOtherRolesPlugin.optionsPage)
         {
@@ -1524,7 +1658,6 @@ public class HudManagerUpdate
 
         for (int i = 0; i < blockCount; i++)
         {
-            BetterOtherRolesPlugin.Logger.LogMessage(blockCount);
             settingsTMPs[i].transform.localPosition = new Vector3(-blockCount * 1.2f + 2.7f * i, 2.2f, -500f);
         }
     }

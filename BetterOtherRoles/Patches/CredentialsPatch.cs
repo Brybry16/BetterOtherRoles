@@ -53,6 +53,7 @@ namespace BetterOtherRoles.Patches
                     string gameModeText = $"";
                     if (HideNSeek.isHideNSeekGM) gameModeText = $"Hide 'N Seek";
                     else if (HandleGuesser.isGuesserGm) gameModeText = $"Guesser";
+                    else if (PropHunt.isPropHuntGM) gameModeText = "Prop Hunt";
                     if (gameModeText != "") gameModeText = " - " + Helpers.cs(Color.yellow, gameModeText);
                     var needEol = gameModeText != string.Empty || DevConfig.IsDingusRelease;
                     __instance.text.text =
@@ -78,6 +79,7 @@ namespace BetterOtherRoles.Patches
                     string gameModeText = $"";
                     if (TORMapOptions.gameMode == CustomGamemodes.HideNSeek) gameModeText = $"Hide 'N Seek";
                     else if (TORMapOptions.gameMode == CustomGamemodes.Guesser) gameModeText = $"Guesser";
+                    else if (TORMapOptions.gameMode == CustomGamemodes.PropHunt) gameModeText = $"Prop Hunt";
                     if (gameModeText != "") gameModeText = Helpers.cs(Color.yellow, gameModeText) + "\n";
 
                     __instance.text.text =

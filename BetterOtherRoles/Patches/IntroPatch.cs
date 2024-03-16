@@ -58,6 +58,13 @@ namespace BetterOtherRoles.Patches {
                             player.gameObject.SetActive(true);
                         }
 
+                    } else if (PropHunt.isPropHuntGM) {
+                        player.transform.localPosition = bottomLeft + new Vector3(-1.25f, -0.1f, 0) + Vector3.right * hideNSeekCounter++ * 0.4f;
+                        player.transform.localScale = Vector3.one * 0.24f;
+                        player.setSemiTransparent(false);
+                        player.cosmetics.nameText.transform.localPosition += Vector3.up * 0.2f * (hideNSeekCounter % 2 == 0 ? 1 : -1);
+                        player.SetFlipX(false);
+                        player.gameObject.SetActive(true);
                     } else {   //  This can be done for all players not just for the bounty hunter as it was before. Allows the thief to have the correct position and scaling
                         player.transform.localPosition = bottomLeft;
                         player.transform.localScale = Vector3.one * 0.4f;
@@ -82,7 +89,7 @@ namespace BetterOtherRoles.Patches {
             SoundEffectsManager.Load();
 
             // First kill
-            if (AmongUsClient.Instance.AmHost && FirstKillShield.Enabled && FirstKillShield.FirstKilledPlayerName != string.Empty && !HideNSeek.isHideNSeekGM) {
+            if (AmongUsClient.Instance.AmHost && FirstKillShield.Enabled && FirstKillShield.FirstKilledPlayerName != string.Empty && !HideNSeek.isHideNSeekGM && !PropHunt.isPropHuntGM) {
                 PlayerControl target = PlayerControl.AllPlayerControls.ToArray().ToList().FirstOrDefault(x => x.Data.PlayerName.Equals(FirstKillShield.FirstKilledPlayerName));
                 if (target != null) {
                     MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.SetFirstKill, Hazel.SendOption.Reliable, -1);

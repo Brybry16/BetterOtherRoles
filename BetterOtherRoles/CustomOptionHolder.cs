@@ -399,6 +399,33 @@ namespace BetterOtherRoles {
         public static CustomOption huntedShieldDuration;
         public static CustomOption huntedShieldRewindTime;
         public static CustomOption huntedShieldNumber;
+        
+        // Prop Hunt Settings
+        public static CustomOption propHuntMap;
+        public static CustomOption propHuntTimer;
+        public static CustomOption propHuntNumberOfHunters;
+        public static CustomOption hunterInitialBlackoutTime;
+        public static CustomOption hunterMissCooldown;
+        public static CustomOption hunterHitCooldown;
+        public static CustomOption hunterMaxMissesBeforeDeath;
+        public static CustomOption propBecomesHunterWhenFound;
+        public static CustomOption propHunterVision;
+        public static CustomOption propVision;
+        public static CustomOption propHuntRevealCooldown;
+        public static CustomOption propHuntRevealDuration;
+        public static CustomOption propHuntRevealPunish;
+        public static CustomOption propHuntUnstuckCooldown;
+        public static CustomOption propHuntUnstuckDuration;
+        public static CustomOption propHuntInvisCooldown;
+        public static CustomOption propHuntInvisDuration;
+        public static CustomOption propHuntSpeedboostCooldown;
+        public static CustomOption propHuntSpeedboostDuration;
+        public static CustomOption propHuntSpeedboostSpeed;
+        public static CustomOption propHuntSpeedboostEnabled;
+        public static CustomOption propHuntInvisEnabled;
+        public static CustomOption propHuntAdminCooldown;
+        public static CustomOption propHuntFindCooldown;
+        public static CustomOption propHuntFindDuration;
 
         internal static Dictionary<byte, byte[]> blockedRolePairings = new Dictionary<byte, byte[]>();
 
@@ -409,6 +436,10 @@ namespace BetterOtherRoles {
         private static byte ToByte(float f) {
             f = Mathf.Clamp01(f);
             return (byte)(f * 255);
+        }
+        
+        public static bool isMapSelectionOption(CustomOption option) {
+            return option == CustomOptionHolder.propHuntMap && option == CustomOptionHolder.hideNSeekMap;
         }
 
         public static void Load() {
@@ -754,7 +785,11 @@ namespace BetterOtherRoles {
             guesserGamemodeCantGuessSnitchIfTaksDone = CustomOption.Create(2010, Types.Guesser, "Guesser Can't Guess Snitch When Tasks Completed", true, null);
 
             // Hide N Seek Gamemode (3000 - 3999)
-            hideNSeekMap = CustomOption.Create(3020, Types.HideNSeekMain, cs(Color.yellow, "Map"), new string[] { "The Skeld", "Mira", "Polus", "Airship", "Submerged" }, null, true);
+            hideNSeekMap = CustomOption.Create(3020, Types.HideNSeekMain, cs(Color.yellow, "Map"), new string[] { "The Skeld", "Mira", "Polus", "Airship", "Submerged", "LI Map"}, null, true, onChange:
+                () =>
+                {
+                    int map = hideNSeekMap.selection; if (map >= 3) map++; GameOptionsManager.Instance.currentNormalGameOptions.MapId = (byte)map;
+                });
             hideNSeekHunterCount = CustomOption.Create(3000, Types.HideNSeekMain, cs(Color.yellow, "Number Of Hunters"), 1f, 1f, 3f, 1f);
             hideNSeekKillCooldown = CustomOption.Create(3021, Types.HideNSeekMain, cs(Color.yellow, "Kill Cooldown"), 10f, 2.5f, 60f, 2.5f, suffix: "s");
             hideNSeekHunterVision = CustomOption.Create(3001, Types.HideNSeekMain, cs(Color.yellow, "Hunter Vision"), 0.5f, 0.25f, 2f, 0.25f, suffix: "µ");
@@ -762,7 +797,7 @@ namespace BetterOtherRoles {
             hideNSeekCommonTasks = CustomOption.Create(3023, Types.HideNSeekMain, cs(Color.yellow, "Common Tasks"), 1f, 0f, 4f, 1f);
             hideNSeekShortTasks = CustomOption.Create(3024, Types.HideNSeekMain, cs(Color.yellow, "Short Tasks"), 3f, 1f, 23f, 1f);
             hideNSeekLongTasks = CustomOption.Create(3025, Types.HideNSeekMain, cs(Color.yellow, "Long Tasks"), 3f, 0f, 15f, 1f);
-            hideNSeekTimer = CustomOption.Create(3003, Types.HideNSeekMain, cs(Color.yellow, "Timer In Min"), 5f, 1f, 30f, 1f);
+            hideNSeekTimer = CustomOption.Create(3003, Types.HideNSeekMain, cs(Color.yellow, "Timer In Min"), 5f, 1f, 30f, 0.5f);
             hideNSeekTaskWin = CustomOption.Create(3004, Types.HideNSeekMain, cs(Color.yellow, "Task Win Is Possible"), false);
             hideNSeekTaskPunish = CustomOption.Create(3017, Types.HideNSeekMain, cs(Color.yellow, "Finish Tasks Punishment"), 10f, 0f, 30f, 1f, suffix: "s");
             hideNSeekCanSabotage = CustomOption.Create(3019, Types.HideNSeekMain, cs(Color.yellow, "Enable Sabotages"), false);
@@ -784,6 +819,34 @@ namespace BetterOtherRoles {
             huntedShieldRewindTime = CustomOption.Create(3018, Types.HideNSeekRoles, cs(Color.gray, "Hunted Rewind Time"), 3f, 1f, 10f, 1f, suffix: "s");
             huntedShieldNumber = CustomOption.Create(3026, Types.HideNSeekRoles, cs(Color.gray, "Hunted Shield Number"), 3f, 1f, 15f, 1f);
 
+            // Prop Hunt General Options
+            propHuntMap = CustomOption.Create(4020, Types.PropHunt, cs(Color.yellow, "Map"), new string[] { "The Skeld", "Mira", "Polus", "Airship", "Submerged", "LI Map"}, null, true, onChange: ()=> { int map = propHuntMap.selection; if (map >= 3) map++; GameOptionsManager.Instance.currentNormalGameOptions.MapId = (byte)map;});
+            propHuntTimer = CustomOption.Create(4021, Types.PropHunt, cs(Color.yellow, "Timer In Min"), 5f, 1f, 30f, 0.5f);
+            propHuntUnstuckCooldown = CustomOption.Create(4011, Types.PropHunt, cs(Color.yellow, "Unstuck Cooldown"), 30f, 2.5f, 60f, 2.5f);
+            propHuntUnstuckDuration = CustomOption.Create(4012, Types.PropHunt, cs(Color.yellow, "Unstuck Duration"), 2f, 1f, 60f, 1f);
+            propHunterVision = CustomOption.Create(4006, Types.PropHunt, cs(Color.yellow, "Hunter Vision"), 0.5f, 0.25f, 2f, 0.25f);
+            propVision = CustomOption.Create(4007, Types.PropHunt, cs(Color.yellow, "Prop Vision"), 2f, 0.25f, 5f, 0.25f);
+            // Hunter Options
+            propHuntNumberOfHunters = CustomOption.Create(4000, Types.PropHunt, cs(Color.red, "Number Of Hunters"), 1f, 1f, 5f, 1f, null, true);
+            hunterInitialBlackoutTime = CustomOption.Create(4001, Types.PropHunt, cs(Color.red, "Hunter Initial Blackout Duration"), 10f, 5f, 20f, 1f);
+            hunterMissCooldown = CustomOption.Create(4004, Types.PropHunt, cs(Color.red, "Kill Cooldown After Miss"), 10f, 2.5f, 60f, 2.5f);
+            hunterHitCooldown = CustomOption.Create(4005, Types.PropHunt, cs(Color.red, "Kill Cooldown After Hit"), 10f, 2.5f, 60f, 2.5f);
+            propHuntRevealCooldown = CustomOption.Create(4008, Types.PropHunt, cs(Color.red, "Reveal Prop Cooldown"), 30f, 10f, 90f, 2.5f);
+            propHuntRevealDuration = CustomOption.Create(4009, Types.PropHunt, cs(Color.red, "Reveal Prop Duration"), 5f, 1f, 60f, 1f);
+            propHuntRevealPunish = CustomOption.Create(4010, Types.PropHunt, cs(Color.red, "Reveal Time Punish"), 10f, 0f, 1800f, 5f);
+            propHuntAdminCooldown = CustomOption.Create(4022, Types.PropHunt, cs(Color.red, "Hunter Admin Cooldown"), 30f, 2.5f, 1800f, 2.5f);
+            propHuntFindCooldown = CustomOption.Create(4023, Types.PropHunt, cs(Color.red, "Find Cooldown"), 60f, 2.5f, 1800f, 2.5f);
+            propHuntFindDuration = CustomOption.Create(4024, Types.PropHunt, cs(Color.red, "Find Duration"), 5f, 1f, 15f, 1f);
+            // Prop Options
+            propBecomesHunterWhenFound = CustomOption.Create(4003, Types.PropHunt, cs(Palette.CrewmateBlue, "Props Become Hunters When Found"), false, null, true);
+            propHuntInvisEnabled = CustomOption.Create(4013, Types.PropHunt, cs(Palette.CrewmateBlue, "Invisibility Enabled"), true, null, true);
+            propHuntInvisCooldown = CustomOption.Create(4014, Types.PropHunt, cs(Palette.CrewmateBlue, "Invisibility Cooldown"), 120f, 10f, 1800f, 2.5f, propHuntInvisEnabled);
+            propHuntInvisDuration = CustomOption.Create(4015, Types.PropHunt, cs(Palette.CrewmateBlue, "Invisibility Duration"), 5f, 1f, 30f, 1f, propHuntInvisEnabled);
+            propHuntSpeedboostEnabled = CustomOption.Create(4016, Types.PropHunt, cs(Palette.CrewmateBlue, "Speedboost Enabled"), true, null, true);
+            propHuntSpeedboostCooldown = CustomOption.Create(4017, Types.PropHunt, cs(Palette.CrewmateBlue, "Speedboost Cooldown"), 60f, 2.5f, 1800f, 2.5f, propHuntSpeedboostEnabled);
+            propHuntSpeedboostDuration = CustomOption.Create(4018, Types.PropHunt, cs(Palette.CrewmateBlue, "Speedboost Duration"), 5f, 1f, 15f, 1f, propHuntSpeedboostEnabled);
+            propHuntSpeedboostSpeed = CustomOption.Create(4019, Types.PropHunt, cs(Palette.CrewmateBlue, "Speedboost Ratio"), 2f, 1.25f, 5f, 0.25f, propHuntSpeedboostEnabled);
+            
             // Other options
             RandomizePlayersInMeeting = CustomOption.Create(5020, Types.General, "Randomize Players Order In Meetings", false, isHeader: true);
             RandomizeWireTaskPositions = CustomOption.Create(5006, Types.General, "Randomize Wire Tasks Positions", false, isHeader: true);
