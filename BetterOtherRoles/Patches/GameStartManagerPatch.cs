@@ -52,11 +52,8 @@ namespace BetterOtherRoles.Patches {
         
             public static void Prefix(GameStartManager __instance) {
                 if (!GameData.Instance ) return; // No instance
+                __instance.MinPlayers = 1;
                 update = GameData.Instance.PlayerCount != __instance.LastPlayerCount;
-                if (DevConfig.DisablePlayerRequirementToLaunch)
-                {
-                    __instance.MinPlayers = 1;
-                }
         
                 if (__instance.startState == GameStartManager.StartingStates.Countdown)
                 {
@@ -140,7 +137,7 @@ namespace BetterOtherRoles.Patches {
                             break;
                         }
                     }
-                    if ((continueStart && TORMapOptions.gameMode == CustomGamemodes.HideNSeek || TORMapOptions.gameMode == CustomGamemodes.PropHunt) && GameOptionsManager.Instance.CurrentGameOptions.MapId != 6) {
+                    if (continueStart && (TORMapOptions.gameMode == CustomGamemodes.HideNSeek || TORMapOptions.gameMode == CustomGamemodes.PropHunt) && GameOptionsManager.Instance.CurrentGameOptions.MapId != 6) {
                         byte mapId = 0;
                         if (TORMapOptions.gameMode == CustomGamemodes.HideNSeek) mapId = (byte)CustomOptionHolder.hideNSeekMap.getSelection();
                         else if (TORMapOptions.gameMode == CustomGamemodes.PropHunt) mapId = (byte)CustomOptionHolder.propHuntMap.getSelection();
@@ -163,6 +160,7 @@ namespace BetterOtherRoles.Patches {
                         probabilities.Add(CustomOptionHolder.dynamicMapEnableMira.getFloat() / 100f);
                         probabilities.Add(CustomOptionHolder.dynamicMapEnablePolus.getFloat() / 100f);
                         probabilities.Add(CustomOptionHolder.dynamicMapEnableAirShip.getFloat() / 100f);
+                        probabilities.Add(CustomOptionHolder.dynamicMapEnableFungle.getFloat() / 100f);
                         probabilities.Add(CustomOptionHolder.dynamicMapEnableSubmerged.getFloat() / 100f);
 
                         // if any map is at 100%, remove all maps that are not!

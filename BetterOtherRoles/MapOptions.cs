@@ -18,6 +18,7 @@ namespace BetterOtherRoles{
         public static bool showLighterDarker = true;
         public static bool enableSoundEffects = true;
         public static bool enableHorseMode = false;
+        public static bool showVentsOnMap = true;
 
         public static CustomGamemodes gameMode
         {
@@ -59,6 +60,7 @@ namespace BetterOtherRoles{
             showLighterDarker = BetterOtherRolesPlugin.ShowLighterDarker.Value;
             enableSoundEffects = BetterOtherRolesPlugin.EnableSoundEffects.Value;
             enableHorseMode = BetterOtherRolesPlugin.EnableHorseMode.Value;
+            showVentsOnMap = BetterOtherRolesPlugin.ShowVentsOnMap.Value;
             //Patches.ShouldAlwaysHorseAround.isHorseMode = TheOtherRolesPlugin.EnableHorseMode.Value;
         }
     }

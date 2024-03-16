@@ -15,7 +15,7 @@ namespace BetterOtherRoles.Patches {
         [HarmonyPrefix]
         [HarmonyPatch(typeof(ShipStatus), nameof(ShipStatus.CalculateLightRadius))]
         public static bool Prefix(ref float __result, ShipStatus __instance, [HarmonyArgument(0)] GameData.PlayerInfo player) {
-            if (!__instance.Systems.ContainsKey(SystemTypes.Electrical) || GameOptionsManager.Instance.currentGameOptions.GameMode == GameModes.HideNSeek) return true;
+            if ((!__instance.Systems.ContainsKey(SystemTypes.Electrical) && !Helpers.isFungle()) || GameOptionsManager.Instance.currentGameOptions.GameMode == GameModes.HideNSeek) return true;
 
             // If Game Mode is PropHunt:
             if (PropHunt.isPropHuntGM) {
@@ -87,8 +87,11 @@ namespace BetterOtherRoles.Patches {
 
             if (isImpostor) return shipStatus.MaxLightRadius * GameOptionsManager.Instance.currentNormalGameOptions.ImpostorLightMod;
 
-            SwitchSystem switchSystem = MapUtilities.Systems[SystemTypes.Electrical].CastFast<SwitchSystem>();
-            float lerpValue = switchSystem.Value / 255f;
+            float lerpValue = 1.0f;
+            try {
+                SwitchSystem switchSystem = MapUtilities.Systems[SystemTypes.Electrical].CastFast<SwitchSystem>();
+                lerpValue = switchSystem.Value / 255f;
+            } catch { }
 
             return Mathf.Lerp(shipStatus.MinLightRadius, shipStatus.MaxLightRadius, lerpValue) * GameOptionsManager.Instance.currentNormalGameOptions.CrewLightMod;
         }
@@ -133,6 +136,7 @@ namespace BetterOtherRoles.Patches {
                 GameOptionsManager.Instance.currentNormalGameOptions.NumLongTasks = Mathf.RoundToInt(CustomOptionHolder.hideNSeekLongTasks.getFloat());
             }
 
+            MapBehaviourPatch.VentNetworks.Clear();
             return true;
         }
 

@@ -141,30 +141,30 @@ namespace BetterOtherRoles.Patches {
 
         [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.BloopAVoteIcon))]
         class MeetingHudBloopAVoteIconPatch {
-            public static bool Prefix(MeetingHud __instance, [HarmonyArgument(0)]GameData.PlayerInfo voterPlayer, [HarmonyArgument(1)]int index, [HarmonyArgument(2)]Transform parent) {
-                var spriteRenderer = UnityEngine.Object.Instantiate<SpriteRenderer>(__instance.PlayerVotePrefab);
-                var showVoteColors = !GameManager.Instance.LogicOptions.GetAnonymousVotes() ||
-                                     (CachedPlayer.LocalPlayer.Data.IsDead && TORMapOptions.ghostsSeeVotes) || 
-                                     (Mayor.mayor != null && Mayor.mayor == CachedPlayer.LocalPlayer.PlayerControl && Mayor.canSeeVoteColors && TasksHandler.taskInfo(CachedPlayer.LocalPlayer.Data).Item1 >= Mayor.tasksNeededToSeeVoteColors);
-                if (showVoteColors)
-                {
-                    PlayerMaterial.SetColors(voterPlayer.DefaultOutfit.ColorId, spriteRenderer);
-                }
-                else
-                {
-                    PlayerMaterial.SetColors(Palette.DisabledGrey, spriteRenderer);
-                }
+            public static bool Prefix(MeetingHud __instance, GameData.PlayerInfo voterPlayer, int index, Transform parent) {
+                    var spriteRenderer = UnityEngine.Object.Instantiate<SpriteRenderer>(__instance.PlayerVotePrefab);
+                    var showVoteColors = !GameManager.Instance.LogicOptions.GetAnonymousVotes() ||
+                                         (CachedPlayer.LocalPlayer.Data.IsDead && TORMapOptions.ghostsSeeVotes) || 
+                                         (Mayor.mayor != null && Mayor.mayor == CachedPlayer.LocalPlayer.PlayerControl && Mayor.canSeeVoteColors && TasksHandler.taskInfo(CachedPlayer.LocalPlayer.Data).Item1 >= Mayor.tasksNeededToSeeVoteColors);
+                    if (showVoteColors)
+                    {
+                        PlayerMaterial.SetColors(voterPlayer.DefaultOutfit.ColorId, spriteRenderer);
+                    }
+                    else
+                    {
+                        PlayerMaterial.SetColors(Palette.DisabledGrey, spriteRenderer);
+                    }
 
-                var transform = spriteRenderer.transform;
-                transform.SetParent(parent);
-                transform.localScale = Vector3.zero;
-                var component = parent.GetComponent<PlayerVoteArea>();
-                if (component != null)
-                {
-                    spriteRenderer.material.SetInt(PlayerMaterial.MaskLayer, component.MaskLayer);
-                }
+                    var transform = spriteRenderer.transform;
+                    transform.SetParent(parent);
+                    transform.localScale = Vector3.zero;
+                    var component = parent.GetComponent<PlayerVoteArea>();
+                    if (component != null)
+                    {
+                        spriteRenderer.material.SetInt(PlayerMaterial.MaskLayer, component.MaskLayer);
+                    }
 
-                __instance.StartCoroutine(Effects.Bloop(index * 0.3f, transform));
+                    __instance.StartCoroutine(Effects.Bloop(index * 0.3f, transform));
                 parent.GetComponent<VoteSpreader>().AddVote(spriteRenderer);
                 return false;
             }
@@ -173,7 +173,7 @@ namespace BetterOtherRoles.Patches {
         [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.PopulateResults))]
         class MeetingHudPopulateVotesPatch {
             
-            static bool Prefix(MeetingHud __instance, Il2CppStructArray<MeetingHud.VoterState> states) {
+            private static bool Prefix(MeetingHud __instance, Il2CppStructArray<MeetingHud.VoterState> states) {
                 // Swapper swap
 
                 PlayerVoteArea swapped1 = null;
@@ -684,9 +684,9 @@ namespace BetterOtherRoles.Patches {
                 // Resett Bait list
                 Bait.active = new Dictionary<DeadPlayer, float>();
                 // Save AntiTeleport position, if the player is able to move (i.e. not on a ladder or a gap thingy)
-                if (CachedPlayer.LocalPlayer.PlayerPhysics.enabled && CachedPlayer.LocalPlayer.PlayerControl.moveable || CachedPlayer.LocalPlayer.PlayerControl.inVent
+                if (CachedPlayer.LocalPlayer.PlayerPhysics.enabled && (CachedPlayer.LocalPlayer.PlayerControl.moveable || CachedPlayer.LocalPlayer.PlayerControl.inVent
                     || HudManagerStartPatch.hackerVitalsButton.isEffectActive || HudManagerStartPatch.hackerAdminTableButton.isEffectActive || HudManagerStartPatch.securityGuardCamButton.isEffectActive
-                    || Portal.isTeleporting && Portal.teleportedPlayers.Last().playerId == CachedPlayer.LocalPlayer.PlayerId) {
+                    || Portal.isTeleporting && Portal.teleportedPlayers.Last().playerId == CachedPlayer.LocalPlayer.PlayerId)) {
                     AntiTeleport.position = CachedPlayer.LocalPlayer.transform.position;
                 }
 
@@ -748,7 +748,7 @@ namespace BetterOtherRoles.Patches {
                             if (x == 1f) {
                                 foreach (PlayerControl p in CachedPlayer.AllPlayers) {
                                     if (Snitch.targets == Snitch.Targets.Killers && !Helpers.isKiller(p)) continue;
-                                    else if (Snitch.targets == Snitch.Targets.EvilPlayers && !Helpers.isEvil(p)) continue;
+                                    if (Snitch.targets == Snitch.Targets.EvilPlayers && !Helpers.isEvil(p)) continue;
                                     if (!Snitch.playerRoomMap.ContainsKey(p.PlayerId)) continue;
                                     if (p.Data.IsDead) continue;
                                     var room = Snitch.playerRoomMap[p.PlayerId];

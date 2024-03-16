@@ -17,7 +17,7 @@ using AmongUs.Data;
 using AmongUs.GameOptions;
 using BetterOtherRoles.Eno;
 using BetterOtherRoles.Modules;
-using UnityEngine.UIElements;
+using Assets.CoreScripts;
 
 namespace BetterOtherRoles
 {
@@ -194,6 +194,7 @@ namespace BetterOtherRoles
             GameStartManagerPatch.GameStartManagerUpdatePatch.startingTimer = 0;
             SurveillanceMinigamePatch.nightVisionOverlays = null;
             EventUtility.clearAndReload();
+            MapBehaviourPatch.clearAndReload();
         }
 
     public static void HandleShareOptions(byte numberOfOptions, MessageReader reader) {            
@@ -608,6 +609,7 @@ namespace BetterOtherRoles
             if (Camouflager.camouflager == null) return;
 
             Camouflager.camouflageTimer = Camouflager.duration;
+            if (Helpers.MushroomSabotageActive()) return; // Dont overwrite the fungle "camo"
             foreach (PlayerControl player in CachedPlayer.AllPlayers)
                 player.setLook("", 6, "", "", "", "");
         }
@@ -817,7 +819,7 @@ namespace BetterOtherRoles
                 target.cosmetics.colorBlindText.gameObject.SetActive(DataManager.Settings.Accessibility.ColorBlindMode);
                 target.cosmetics.colorBlindText.color = target.cosmetics.colorBlindText.color.SetAlpha(1f);
 
-                if (Camouflager.camouflageTimer <= 0) target.setDefaultLook();
+                if (Camouflager.camouflageTimer <= 0 && !Helpers.MushroomSabotageActive()) target.setDefaultLook();
                 Ninja.isInvisble = false;
                 return;
             }
@@ -901,13 +903,20 @@ namespace BetterOtherRoles
 
             SecurityGuard.remainingScrews -= SecurityGuard.ventPrice;
             if (CachedPlayer.LocalPlayer.PlayerControl == SecurityGuard.securityGuard) {
-                PowerTools.SpriteAnim animator = vent.GetComponent<PowerTools.SpriteAnim>(); 
-                animator?.Stop();
+                PowerTools.SpriteAnim animator = vent.GetComponent<PowerTools.SpriteAnim>();
                 vent.EnterVentAnim = vent.ExitVentAnim = null;
-                vent.myRend.sprite = animator == null ? SecurityGuard.getStaticVentSealedSprite() : SecurityGuard.getAnimatedVentSealedSprite();
+                Sprite newSprite = animator == null ? SecurityGuard.getStaticVentSealedSprite() : SecurityGuard.getAnimatedVentSealedSprite();
+                SpriteRenderer rend = vent.myRend;
+                if (Helpers.isFungle()) {
+                    newSprite = SecurityGuard.getFungleVentSealedSprite();
+                    rend = vent.transform.GetChild(3).GetComponent<SpriteRenderer>();
+                    animator = vent.transform.GetChild(3).GetComponent<PowerTools.SpriteAnim>();
+                }
+                animator?.Stop();
+                rend.sprite = newSprite;
                 if (SubmergedCompatibility.IsSubmerged && vent.Id == 0) vent.myRend.sprite = SecurityGuard.getSubmergedCentralUpperSealedSprite();
                 if (SubmergedCompatibility.IsSubmerged && vent.Id == 14) vent.myRend.sprite = SecurityGuard.getSubmergedCentralLowerSealedSprite();
-                vent.myRend.color = new Color(1f, 1f, 1f, 0.5f);
+                rend.color = new Color(1f, 1f, 1f, 0.5f);
                 vent.name = "FutureSealedVent_" + vent.name;
             }
 
@@ -955,6 +964,15 @@ namespace BetterOtherRoles
                 if (!Thief.thief.Data.IsDead && !Thief.isFailedThiefKill(dyingTarget, guesser, roleInfo)) {
                     RPCProcedure.thiefStealsRole(dyingTarget.PlayerId);
                 }
+            }
+            
+            if (Lawyer.lawyer != null && !Lawyer.isProsecutor && Lawyer.lawyer.PlayerId == killerId && Lawyer.target != null && Lawyer.target.PlayerId == dyingTargetId) {
+                // Lawyer guessed client.
+                if (CachedPlayer.LocalPlayer.PlayerControl == Lawyer.lawyer) {
+                    FastDestroyableSingleton<HudManager>.Instance.KillOverlay.ShowKillAnimation(Lawyer.lawyer.Data, Lawyer.lawyer.Data);
+                    if (MeetingHudPatch.guesserUI != null) MeetingHudPatch.guesserUIExitButton.OnClick.Invoke();
+                }
+                Lawyer.lawyer.Exiled();
             }
 
             dyingTarget.Exiled();
@@ -1165,7 +1183,11 @@ namespace BetterOtherRoles
             PlayerControl player = Helpers.playerById(playerId);
             var prop = PropHunt.FindPropByNameAndPos(propName, posX);
             if (prop == null) return;
-            player.GetComponent<SpriteRenderer>().sprite = prop.GetComponent<SpriteRenderer>().sprite;
+            try {
+                player.GetComponent<SpriteRenderer>().sprite = prop.GetComponent<SpriteRenderer>().sprite;
+            } catch {
+                player.GetComponent<SpriteRenderer>().sprite = prop.transform.GetComponentInChildren<SpriteRenderer>().sprite;
+            }
             player.transform.localScale = prop.transform.lossyScale;
             player.Visible = false;
             PropHunt.currentObject[player.PlayerId] = new Tuple<string, float>(propName, posX);

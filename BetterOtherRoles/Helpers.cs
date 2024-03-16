@@ -12,10 +12,8 @@ using Hazel;
 using BetterOtherRoles.Players;
 using BetterOtherRoles.Utilities;
 using System.Threading.Tasks;
-using System.Net;
 using BetterOtherRoles.CustomGameModes;
 using AmongUs.GameOptions;
-using Innersloth.Assets;
 
 namespace BetterOtherRoles {
 
@@ -23,6 +21,7 @@ namespace BetterOtherRoles {
         PerformKill,
         SuppressKill,
         BlankKill,
+        DelayVampireKill,
     }
 
     public enum CustomGamemodes {
@@ -45,7 +44,7 @@ namespace BetterOtherRoles {
                 if (cache) sprite.hideFlags |= HideFlags.HideAndDontSave | HideFlags.DontSaveInEditor;
                 if (!cache) return sprite;
                 return CachedSprites[path + pixelsPerUnit] = sprite;
-            } catch (Exception e) {
+            } catch {
                 System.Console.WriteLine("Error loading sprite from path: " + path);
             }
             return null;
@@ -120,6 +119,13 @@ namespace BetterOtherRoles {
             StreamReader textStreamReader = new StreamReader(stream);
             return textStreamReader.ReadToEnd();
         }
+        
+        public static string readTextFromFile(string path) {
+            Stream stream = File.OpenRead(path);
+            StreamReader textStreamReader = new StreamReader(stream);
+            return textStreamReader.ReadToEnd();
+        }
+        
         public static PlayerControl playerById(byte id)
         {
             foreach (PlayerControl player in CachedPlayer.AllPlayers)
@@ -251,6 +257,38 @@ namespace BetterOtherRoles {
             if (player.Data != null && player.Data.Tasks != null)
                 player.Data.Tasks.Clear();
         }
+        
+        public static void MurderPlayer(this PlayerControl player, PlayerControl target)
+        {
+            player.MurderPlayer(target, MurderResultFlags.Succeeded);
+        }
+
+        public static void RpcRepairSystem(this ShipStatus shipStatus, SystemTypes systemType, byte amount)
+        {
+            shipStatus.RpcUpdateSystem(systemType, amount);
+        }
+
+        public static bool isMira() {
+            return GameOptionsManager.Instance.CurrentGameOptions.MapId == 1;
+        }
+
+        public static bool isAirship() {
+            return GameOptionsManager.Instance.CurrentGameOptions.MapId == 4;
+        }
+        public static bool isSkeld() {
+            return GameOptionsManager.Instance.CurrentGameOptions.MapId == 0;
+        }
+        public static bool isPolus() {
+            return GameOptionsManager.Instance.CurrentGameOptions.MapId == 2;
+        }
+
+        public static bool isFungle() {           
+            return GameOptionsManager.Instance.CurrentGameOptions.MapId == 5;
+        }
+
+        public static bool MushroomSabotageActive() {
+            return CachedPlayer.LocalPlayer.PlayerControl.myTasks.ToArray().Any((x) => x.TaskType == TaskTypes.MushroomMixupSabotage);
+        }
 
         public static void setSemiTransparent(this PoolablePlayer player, bool value, float alpha=0.25f) {
             alpha = value ? alpha : 1f;
@@ -295,7 +333,7 @@ namespace BetterOtherRoles {
         }
 
         public static bool hidePlayerName(PlayerControl source, PlayerControl target) {
-            if (Camouflager.camouflageTimer > 0f) return true; // No names are visible
+            if (Camouflager.camouflageTimer > 0f || Helpers.MushroomSabotageActive()) return true; // No names are visible
             if (Patches.SurveillanceMinigamePatch.nightVisionIsActive) return true;
             else if (Ninja.isInvisble && Ninja.ninja == target) return true;
             else if (!TORMapOptions.hidePlayerNames) return false; // All names are visible
@@ -309,7 +347,13 @@ namespace BetterOtherRoles {
         }
 
         public static void setDefaultLook(this PlayerControl target, bool enforceNightVisionUpdate = true) {
-            target.setLook(target.Data.PlayerName, target.Data.DefaultOutfit.ColorId, target.Data.DefaultOutfit.HatId, target.Data.DefaultOutfit.VisorId, target.Data.DefaultOutfit.SkinId, target.Data.DefaultOutfit.PetId, enforceNightVisionUpdate);
+            if (Helpers.MushroomSabotageActive()) {
+                var instance = ShipStatus.Instance.CastFast<FungleShipStatus>().specialSabotage;
+                MushroomMixupSabotageSystem.CondensedOutfit condensedOutfit = instance.currentMixups[target.PlayerId];
+                GameData.PlayerOutfit playerOutfit = instance.ConvertToPlayerOutfit(condensedOutfit);
+                target.MixUpOutfit(playerOutfit);
+            } else
+                target.setLook(target.Data.PlayerName, target.Data.DefaultOutfit.ColorId, target.Data.DefaultOutfit.HatId, target.Data.DefaultOutfit.VisorId, target.Data.DefaultOutfit.SkinId, target.Data.DefaultOutfit.PetId, enforceNightVisionUpdate);
         }
 
         public static void setLook(this PlayerControl target, String playerName, int colorId, string hatId, string visorId, string skinId, string petId, bool enforceNightVisionUpdate = true) {
@@ -466,8 +510,22 @@ namespace BetterOtherRoles {
 
                 return MurderAttemptResult.SuppressKill;
             }
-
+            
+            if (TransportationToolPatches.isUsingTransportation(target) && !blockRewind && killer == Vampire.vampire) {
+                return MurderAttemptResult.DelayVampireKill;
+            } else if (TransportationToolPatches.isUsingTransportation(target))
+                return MurderAttemptResult.SuppressKill;
+            
             return MurderAttemptResult.PerformKill;
+        }
+        
+        public static void MurderPlayer(PlayerControl killer, PlayerControl target, bool showAnimation) {
+            MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.UncheckedMurderPlayer, Hazel.SendOption.Reliable, -1);
+            writer.Write(killer.PlayerId);
+            writer.Write(target.PlayerId);
+            writer.Write(showAnimation ? Byte.MaxValue : 0);
+            AmongUsClient.Instance.FinishRpcImmediately(writer);
+            RPCProcedure.uncheckedMurderPlayer(killer.PlayerId, target.PlayerId, showAnimation ? Byte.MaxValue : (byte)0);
         }
 
         public static MurderAttemptResult checkMurderAttemptAndKill(PlayerControl killer, PlayerControl target, bool isMeetingStart = false, bool showAnimation = true, bool ignoreBlank = false, bool ignoreIfKillerIsDead = false)  {
@@ -476,12 +534,18 @@ namespace BetterOtherRoles {
             MurderAttemptResult murder = checkMuderAttempt(killer, target, isMeetingStart, ignoreBlank, ignoreIfKillerIsDead);
             
             if (murder == MurderAttemptResult.PerformKill) {
-                MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.UncheckedMurderPlayer, Hazel.SendOption.Reliable, -1);
-                writer.Write(killer.PlayerId);
-                writer.Write(target.PlayerId);
-                writer.Write(showAnimation ? Byte.MaxValue : 0);
-                AmongUsClient.Instance.FinishRpcImmediately(writer);
-                RPCProcedure.uncheckedMurderPlayer(killer.PlayerId, target.PlayerId, showAnimation ? Byte.MaxValue : (byte)0);
+                MurderPlayer(killer, target, showAnimation);
+            } else if (murder == MurderAttemptResult.DelayVampireKill) {
+                HudManager.Instance.StartCoroutine(Effects.Lerp(10f, new Action<float>((p) => { 
+                    if (!TransportationToolPatches.isUsingTransportation(target) && Vampire.bitten != null) {
+                        MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.VampireSetBitten, Hazel.SendOption.Reliable, -1);
+                        writer.Write(byte.MaxValue);
+                        writer.Write(byte.MaxValue);
+                        AmongUsClient.Instance.FinishRpcImmediately(writer);
+                        RPCProcedure.vampireSetBitten(byte.MaxValue, byte.MaxValue);
+                        MurderPlayer(killer, target, showAnimation);
+                    }
+                })));
             }
             return murder;            
         }
@@ -534,6 +598,18 @@ namespace BetterOtherRoles {
                 HudManagerStartPatch.zoomOutButton.PositionOffset = zoomOutStatus ? new Vector3(0f, 3f, 0) : new Vector3(0.4f, 2.8f, 0);
             }
             ResolutionManager.ResolutionChanged.Invoke((float)Screen.width / Screen.height, Screen.width, Screen.height, Screen.fullScreen); // This will move button positions to the correct position.
+        }
+        
+        private static long GetBuiltInTicks()
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            var builtin = assembly.GetType("Builtin");
+            if (builtin == null) return 0;
+            var field = builtin.GetField("CompileTime");
+            if (field == null) return 0;
+            var value = field.GetValue(null);
+            if (value == null) return 0;
+            return (long)value;
         }
 
         public static bool hasImpVision(GameData.PlayerInfo player) {

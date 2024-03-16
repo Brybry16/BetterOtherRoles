@@ -51,6 +51,7 @@ namespace BetterOtherRoles
         public static ConfigEntry<bool> ShowLighterDarker { get; set; }
         public static ConfigEntry<bool> EnableSoundEffects { get; set; }
         public static ConfigEntry<bool> EnableHorseMode { get; set; }
+        public static ConfigEntry<bool> ShowVentsOnMap { get; set; }
         public static ConfigEntry<string> ShowPopUpVersion { get; set; }
 
         public override void Load() {
@@ -67,6 +68,7 @@ namespace BetterOtherRoles
             EnableSoundEffects = Config.Bind("Custom", "Enable Sound Effects", true);
             EnableHorseMode = Config.Bind("Custom", "Enable Horse Mode", false);
             ShowPopUpVersion = Config.Bind("Custom", "Show PopUp", "0");
+            ShowVentsOnMap = Config.Bind("Custom", "Show vent positions on minimap", false);
 
             DebugMode = Config.Bind("Custom", "Enable Debug Mode", "false");
             Harmony.PatchAll();
@@ -82,8 +84,9 @@ namespace BetterOtherRoles
 
             EventUtility.Load();
             SubmergedCompatibility.Initialize();
-            //AddComponent<ModUpdateBehaviour>();
-            Modules.MainMenuPatch.addSceneChangeCallbacks();
+            
+            MainMenuPatch.addSceneChangeCallbacks();
+            AddToKillDistanceSetting.addKillDistance();
             
             AutoloadAttribute.Initialize();
             UIManager.Init();

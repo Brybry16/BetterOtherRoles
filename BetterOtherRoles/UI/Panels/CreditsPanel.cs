@@ -95,7 +95,7 @@ Psynomit    probablyadnf    JustASysAdmin
 Streamblox    Draco Cordraconis
 Thanks to all our discord helpers!
 
-Thanks to miniduikboot & GD for hosting modded servers
+Thanks to miniduikboot & GD for hosting modded servers (and so much more)
 
 <b>Other Credits & Resources:</b>
 

@@ -92,6 +92,12 @@ public class LocalOptionsPanel : WrappedPanel
         {
             TORMapOptions.enableSoundEffects = value;
         };
+        
+        var showVentsOnMap = new LocalOptionEditor("Show Vents On Map", this, content, BetterOtherRolesPlugin.ShowVentsOnMap);
+        showVentsOnMap.OnUpdated += value =>
+        {
+            TORMapOptions.showVentsOnMap = value;
+        };
     }
     
     public override void SetActive(bool active)

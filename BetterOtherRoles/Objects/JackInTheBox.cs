@@ -36,6 +36,7 @@ namespace BetterOtherRoles.Objects {
         private GameObject gameObject;
         public Vent vent;
         private SpriteRenderer boxRenderer;
+        private SpriteRenderer ventRenderer;
 
         public JackInTheBox(Vector2 p) {
             gameObject = new GameObject("JackInTheBox"){layer = 11};
@@ -46,6 +47,7 @@ namespace BetterOtherRoles.Objects {
             gameObject.transform.position = position;
             boxRenderer = gameObject.AddComponent<SpriteRenderer>();
             boxRenderer.sprite = getBoxAnimationSprite(0);
+            boxRenderer.color = boxRenderer.color.SetAlpha(0.5f);
 
             // Create the vent
             var referenceVent = UnityEngine.Object.FindObjectOfType<Vent>();
@@ -60,7 +62,13 @@ namespace BetterOtherRoles.Objects {
             vent.Offset = new Vector3(0f, 0.25f, 0f);
             vent.GetComponent<PowerTools.SpriteAnim>()?.Stop();
             vent.Id = MapUtilities.CachedShipStatus.AllVents.Select(x => x.Id).Max() + 1; // Make sure we have a unique id
-            var ventRenderer = vent.GetComponent<SpriteRenderer>();
+            ventRenderer = vent.GetComponent<SpriteRenderer>();
+            if (Helpers.isFungle()) {
+                ventRenderer = vent.transform.GetChild(3).GetComponent<SpriteRenderer>();
+                var animator = vent.transform.GetChild(3).GetComponent<PowerTools.SpriteAnim>();
+                animator?.Stop();
+            }
+            //ventRenderer.Destroy();
             ventRenderer.sprite = null;  // Use the box.boxRenderer instead
             vent.myRend = ventRenderer;
             var allVentsList = MapUtilities.CachedShipStatus.AllVents.ToList();
@@ -69,9 +77,9 @@ namespace BetterOtherRoles.Objects {
             vent.gameObject.SetActive(false);
             vent.name = "JackInTheBoxVent_" + vent.Id;
 
-            // Only render the box for the Trickster
-            var playerIsTrickster = CachedPlayer.LocalPlayer.PlayerControl == Trickster.trickster;
-            gameObject.SetActive(playerIsTrickster);
+            // Only render the box for the Trickster and for Ghosts
+            var showBoxToLocalPlayer  = CachedPlayer.LocalPlayer.PlayerControl == Trickster.trickster || PlayerControl.LocalPlayer.Data.IsDead;
+            gameObject.SetActive(showBoxToLocalPlayer );
 
             AllJackInTheBoxes.Add(this);
         }
@@ -79,14 +87,16 @@ namespace BetterOtherRoles.Objects {
         public static void UpdateStates() {
             if (boxesConvertedToVents == true) return;
             foreach (var box in AllJackInTheBoxes) {
-                var playerIsTrickster = CachedPlayer.LocalPlayer.PlayerControl == Trickster.trickster;
-                box.gameObject.SetActive(playerIsTrickster);
+                var showBoxToLocalPlayer  = CachedPlayer.LocalPlayer.PlayerControl == Trickster.trickster || PlayerControl.LocalPlayer.Data.IsDead;
+                box.gameObject.SetActive(showBoxToLocalPlayer );
             }
         }
 
         public void convertToVent() {
             gameObject.SetActive(true);
             vent.gameObject.SetActive(true);
+            boxRenderer.color = boxRenderer.color.SetAlpha(1f);
+            ventRenderer.sprite = null;
             return;
         }
 

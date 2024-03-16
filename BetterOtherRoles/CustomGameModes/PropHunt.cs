@@ -121,6 +121,21 @@ namespace BetterOtherRoles.CustomGameModes {
         public static Sprite getIntroSprite(int index) {
             return Helpers.loadSpriteFromResources($"BetterOtherRoles.Resources.IntroAnimation.intro_{index + 1000}.png", 150f, cache: false);
         }
+        
+        public static void updateWhitelistedObjects() {
+            BetterOtherRolesPlugin.Logger.LogMessage($"updating whitelisted objects!");
+            string allNames = Helpers.readTextFromResources("BetterOtherRoles.Resources.Txt.props.txt");
+            BetterOtherRolesPlugin.Logger.LogMessage($"raed from res");
+            bool debug = false;
+            if (debug) {
+                allNames = Helpers.readTextFromFile(System.IO.Directory.GetCurrentDirectory() + "\\props.txt"); 
+            }
+            BetterOtherRolesPlugin.Logger.LogMessage($"after debug");
+            whitelistedObjects = allNames.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries).ToList();
+            BetterOtherRolesPlugin.Logger.LogMessage($"after split");
+
+            BetterOtherRolesPlugin.Logger.LogMessage($"Last element: {whitelistedObjects.Last()}");
+        }
 
         public static void propTargetAndTimerDisplayUpdate() {
 
@@ -373,9 +388,8 @@ namespace BetterOtherRoles.CustomGameModes {
             try {
                 Collider2D bestCollider = null;
                 float bestDist = 9999;
-                if (whitelistedObjects == null || whitelistedObjects.Count == 0) {
-                    string allNames = Helpers.readTextFromResources("BetterOtherRoles.Resources.Txt.Props.txt");
-                    whitelistedObjects = allNames.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries).ToList();
+                if (whitelistedObjects == null || whitelistedObjects.Count == 0 || verbose) {
+                    updateWhitelistedObjects();
                 }
                 foreach (Collider2D collider in Physics2D.OverlapCircleAll(origin.transform.position, radius)) {
                     if (verbose) {
