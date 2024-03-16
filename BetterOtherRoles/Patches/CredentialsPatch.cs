@@ -20,7 +20,7 @@ namespace BetterOtherRoles.Patches
         public const string EndOfLine = "\n";
 
         public static string fullCredentialsVersion =
-            $@"<size=130%>{ColoredLogo}</size> v{BetterOtherRolesPlugin.Version.ToString()}";
+            $@"<size=130%>{ColoredLogo}</size> v{BetterOtherRolesPlugin.Version.ToString()}{(BetterOtherRolesPlugin.betaNum > 0 ? "-beta" + BetterOtherRolesPlugin.betaNum : "")}";
 
         public static string fullCredentials =
             $@"{(DevConfig.IsDingusRelease ? $"<size=70%>{DingusRelease}</size>{EndOfLine}" : string.Empty)}<size=70%>{BasedCopyright}</size>{EndOfLine}<size=80%><b>{CreatorsCopyright}</b></size>";
@@ -57,7 +57,7 @@ namespace BetterOtherRoles.Patches
                     if (gameModeText != "") gameModeText = " - " + Helpers.cs(Color.yellow, gameModeText);
                     var needEol = gameModeText != string.Empty || DevConfig.IsDingusRelease;
                     __instance.text.text =
-                        $"<size=130%>{ColoredLogo}</size> v{BetterOtherRolesPlugin.Version.ToString()}\n{(DevConfig.IsDingusRelease ? $"<size=70%>{DingusRelease}</size>" : string.Empty)}{gameModeText}{(needEol ? EndOfLine : string.Empty)}" +
+                        $"<size=130%>{ColoredLogo}</size> v{BetterOtherRolesPlugin.Version.ToString()}{(BetterOtherRolesPlugin.betaNum > 0 ? "-beta" + BetterOtherRolesPlugin.betaNum : "")}\n{(DevConfig.IsDingusRelease ? $"<size=70%>{DingusRelease}</size>" : string.Empty)}{gameModeText}{(needEol ? EndOfLine : string.Empty)}" +
                         __instance.text.text;
                     if (CachedPlayer.LocalPlayer.Data.IsDead || (!(CachedPlayer.LocalPlayer.PlayerControl == null) &&
                                                                  (CachedPlayer.LocalPlayer.PlayerControl ==
@@ -116,7 +116,7 @@ namespace BetterOtherRoles.Patches
                 var credentialObject = new GameObject("credentialsTOR");
                 var credentials = credentialObject.AddComponent<TextMeshPro>();
                 credentials.SetText(
-                    $"v{BetterOtherRolesPlugin.Version.ToString()}\n<size=30f%>\n</size>{mainMenuCredentials}\n");
+                    $"v{BetterOtherRolesPlugin.Version.ToString()}{(BetterOtherRolesPlugin.betaNum > 0 ? "-beta" + BetterOtherRolesPlugin.betaNum : "")}\n<size=30f%>\n</size>{mainMenuCredentials}\n");
                 credentials.alignment = TMPro.TextAlignmentOptions.Center;
                 credentials.fontSize *= 0.05f;
 

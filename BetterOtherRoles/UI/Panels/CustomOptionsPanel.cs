@@ -15,7 +15,7 @@ public class CustomOptionsPanel : WrappedPanel
     {
     }
     
-    public override string Name => $"<color=#fcba03>Better</color><color=#ff351f>OtherRoles</color> v{BetterOtherRolesPlugin.VersionString}";
+    public override string Name => $"<color=#fcba03>Better</color><color=#ff351f>OtherRoles</color> v{BetterOtherRolesPlugin.VersionString}{(BetterOtherRolesPlugin.betaNum > 0 ? "-beta" + BetterOtherRolesPlugin.betaNum : "")}";
 
     public override int MinWidth => 600;
     public override int MinHeight => Screen.height;

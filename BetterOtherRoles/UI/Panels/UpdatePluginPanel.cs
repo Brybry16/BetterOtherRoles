@@ -132,7 +132,7 @@ public class UpdatePluginPanel : WrappedPanel
         var updateType = isUpgrade ? "Upgrade" : isReinstall ? "Reinstall" : "Downgrade";
         var updateTypeColor = isUpgrade ? Color.green : isReinstall ? UIPalette.Info : UIPalette.Warning;
         var updateTypeArrow = isUpgrade ? "\u25b2" : isReinstall ? "=" : "\u25bc";
-        _releaseName.text = $"{Helpers.cs(updateTypeColor, updateType)}: {Helpers.cs(Color.yellow, $"v{BetterOtherRolesPlugin.VersionString}")} {Helpers.cs(updateTypeColor, updateTypeArrow)} {_selectedRelease.Tag}";
+        _releaseName.text = $"{Helpers.cs(updateTypeColor, updateType)}: {Helpers.cs(Color.yellow, $"v{BetterOtherRolesPlugin.VersionString}{(BetterOtherRolesPlugin.betaNum > 0 ? "-beta" + BetterOtherRolesPlugin.betaNum : "")}")} {Helpers.cs(updateTypeColor, updateTypeArrow)} {_selectedRelease.Tag}";
         if (!isCompatible)
         {
             _releaseDescription.text = _selectedRelease.Description;

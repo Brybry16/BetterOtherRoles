@@ -9,7 +9,6 @@ using BetterOtherRoles.Players;
 using BetterOtherRoles.Utilities;
 using System.Linq;
 using BetterOtherRoles.Eno;
-using Reactor.Utilities.Extensions;
 
 namespace BetterOtherRoles.Patches {
     public class GameStartManagerPatch  {
@@ -87,7 +86,7 @@ namespace BetterOtherRoles.Patches {
                     __instance.GameStartText.transform.localPosition = __instance.StartButton.transform.localPosition;
                     
                     if (__instance.startState != GameStartManager.StartingStates.Countdown)
-                        copiedStartButton?.Destroy();
+                        UnityEngine.Object.Destroy(copiedStartButton);
                     
                     // Make starting info available to clients:
                     if (startingTimer <= 0 && __instance.startState == GameStartManager.StartingStates.Countdown) {
@@ -109,7 +108,7 @@ namespace BetterOtherRoles.Patches {
 
                         void StopStartFunc() {
                             __instance.ResetStartState();
-                            copiedStartButton.Destroy();
+                            UnityEngine.Object.Destroy(copiedStartButton);
                             startingTimer = 0;
                         }
                         startButtonPassiveButton.OnClick.AddListener((Action)(() => StopStartFunc()));
@@ -128,7 +127,7 @@ namespace BetterOtherRoles.Patches {
                         __instance.GameStartText.text = String.Empty;
                     
                     if (!__instance.GameStartText.text.StartsWith("Starting") || !CustomOptionHolder.anyPlayerCanStopStart.getBool())
-                    copiedStartButton?.Destroy();
+                        UnityEngine.Object.Destroy(copiedStartButton);
                 
                     if (CustomOptionHolder.anyPlayerCanStopStart.getBool() && copiedStartButton == null && __instance.GameStartText.text.StartsWith("Starting")) {
                         // Activate Stop-Button
@@ -151,7 +150,7 @@ namespace BetterOtherRoles.Patches {
                                 Hazel.SendOption.Reliable, AmongUsClient.Instance.HostId);
                             writer.Write(PlayerControl.LocalPlayer.PlayerId);
                             AmongUsClient.Instance.FinishRpcImmediately(writer);
-                            copiedStartButton.Destroy();
+                            UnityEngine.Object.Destroy(copiedStartButton);
                             __instance.GameStartText.text = String.Empty;
                             startingTimer = 0;
                         }

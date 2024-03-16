@@ -7,7 +7,6 @@ using BetterOtherRoles.Objects;
 using BetterOtherRoles.Players;
 using BetterOtherRoles.UI;
 using BetterOtherRoles.Utilities;
-using Reactor.Utilities.Extensions;
 using UnityEngine;
 
 
@@ -29,7 +28,7 @@ namespace BetterOtherRoles.Patches
 		{
 			foreach (var mapIcon in mapIcons.Values)
 			{
-				mapIcon.Destroy();
+				UnityEngine.Object.Destroy(mapIcon);
 			}
 
 			mapIcons = new();
@@ -124,7 +123,7 @@ namespace BetterOtherRoles.Patches
 				{
 					if (mapIcons.Count > 0)
 					{
-						mapIcons.Values.Do((x) => x.Destroy());
+						mapIcons.Values.Do((x) => UnityEngine.Object.Destroy(x));
 						mapIcons.Clear();
 					}
 

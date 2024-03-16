@@ -108,7 +108,7 @@ public class PluginUpdater : MonoBehaviour
         www.Dispose();
         Releases.Sort(SortReleases);
         var latestRelease = Releases.FirstOrDefault();
-        if (latestRelease != null && latestRelease.Version != BetterOtherRolesPlugin.Version)
+        if (latestRelease != null && (latestRelease.Version != BetterOtherRolesPlugin.Version || BetterOtherRolesPlugin.betaNum > 0))
         {
             UIManager.UpdatePluginPanel?.RefreshDropdown(latestRelease);
             UIManager.UpdatePluginPanel?.SetActive(true);

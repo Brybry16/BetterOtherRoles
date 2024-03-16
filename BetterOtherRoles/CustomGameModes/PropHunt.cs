@@ -2,8 +2,6 @@
 using AmongUs.GameOptions;
 using HarmonyLib;
 using Hazel;
-using Reactor.Utilities;
-using Reactor.Utilities.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -105,16 +103,16 @@ namespace BetterOtherRoles.CustomGameModes {
             findCooldown = CustomOptionHolder.propHuntFindCooldown.getFloat();
             findDuration = CustomOptionHolder.propHuntFindDuration.getFloat();
             timerRunning = false;
-            timerText?.Destroy();
+            UnityEngine.Object.Destroy(timerText);
             timerText = null;
             currentObject = new();
             isCurrentlyRevealed = new();
-            poolablesBackground?.Destroy();
-            foreach (var go in revealRenderer.Values) { go.Destroy(); }
+            UnityEngine.Object.Destroy(poolablesBackground);
+            foreach (var go in revealRenderer.Values) { UnityEngine.Object.Destroy(go); }
             revealRenderer = new();
             speedboostActive = new();
             invisPlayers = new();
-            foreach (var go in duplicatedCollider) { go.Destroy(); }
+            foreach (var go in duplicatedCollider) { UnityEngine.Object.Destroy(go); }
             duplicatedCollider = new();
         }
 
@@ -248,7 +246,7 @@ namespace BetterOtherRoles.CustomGameModes {
                     }
                     else
                     {
-                        revealRenderer[pc.PlayerId].Destroy();
+                        UnityEngine.Object.Destroy(revealRenderer[pc.PlayerId]);
                         isCurrentlyRevealed.Remove(pc.PlayerId);
                         revealRenderer.Remove(pc.PlayerId);
                         poolablePlayer.gameObject.SetActive(true);
@@ -461,12 +459,12 @@ namespace BetterOtherRoles.CustomGameModes {
                     RPCProcedure.propHuntStartTimer();
                     PlayerControl.LocalPlayer.moveable = true;
                     HudManager.Instance.FullScreen.enabled = false;
-                    introObject.Destroy();
+                    UnityEngine.Object.Destroy(introObject);
                 } else {
                     HudManager.Instance.FullScreen.enabled = true;
                     HudManager.Instance.FullScreen.gameObject.SetActive(true);
                     HudManager.Instance.FullScreen.color = new Color(0, 0, 0, 1);
-                    introRenderer.sprite?.Destroy();
+                    UnityEngine.Object.Destroy(introRenderer.sprite);
                     introRenderer.sprite = getIntroSprite(510 - nFrames + (int)(p * nFrames));
                     Resources.UnloadUnusedAssets();  // Needed so that the last sprite gets unloaded
                 }
@@ -498,7 +496,7 @@ namespace BetterOtherRoles.CustomGameModes {
                 if (__instance.GetComponent<SpriteRenderer>().sprite != null && !__instance.myPlayer.Data.Role.IsImpostor) {
                     __instance.myPlayer.Visible = false;
                     __instance.GetComponent<SpriteRenderer>().flipX = __instance.myPlayer.cosmetics.currentBodySprite.BodySprite.flipX;
-                    __instance.myPlayer.cosmetics.currentPet?.Destroy();
+                    UnityEngine.Object.Destroy(__instance.myPlayer.cosmetics.currentPet);
                 }
                 if (__instance.myPlayer.Data.IsDead) {
                     __instance.myPlayer.Visible = PlayerControl.LocalPlayer.Data.IsDead;

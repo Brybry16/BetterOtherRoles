@@ -15,7 +15,6 @@ using AmongUs.GameOptions;
 using BetterOtherRoles.Modules;
 using BetterOtherRoles.UI;
 using InnerNet;
-using Reactor.Utilities.Extensions;
 
 namespace BetterOtherRoles.Patches {
     [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.FixedUpdate))]
@@ -739,7 +738,7 @@ namespace BetterOtherRoles.Patches {
                 }
             }
             else if (Snitch.text != null)
-                Snitch.text.Destroy();
+                UnityEngine.Object.Destroy(Snitch.text);
             
             if (snitchIsDead) {
                 if (MeetingHud.Instance == null) Snitch.needsUpdate = false;
