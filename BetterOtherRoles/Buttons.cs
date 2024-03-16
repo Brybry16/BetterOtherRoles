@@ -11,6 +11,7 @@ using BetterOtherRoles.Players;
 using BetterOtherRoles.Utilities;
 using BetterOtherRoles.CustomGameModes;
 using BetterOtherRoles.Modules;
+using BetterOtherRoles.Patches;
 
 namespace BetterOtherRoles
 {

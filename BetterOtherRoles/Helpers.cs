@@ -14,6 +14,7 @@ using BetterOtherRoles.Utilities;
 using System.Threading.Tasks;
 using BetterOtherRoles.CustomGameModes;
 using AmongUs.GameOptions;
+using BetterOtherRoles.Patches;
 
 namespace BetterOtherRoles {
 

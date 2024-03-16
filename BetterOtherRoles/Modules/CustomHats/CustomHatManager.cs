@@ -132,7 +132,7 @@ public static class CustomHatManager
     
     private static Sprite CreateHatSprite(string path)
     {
-        var texture = Helpers.LoadTextureFromPath(Path.Combine(HatsDirectory, path));
+        var texture = Helpers.loadTextureFromDisk(Path.Combine(HatsDirectory, path));
         if (texture == null)
             texture = Helpers.loadTextureFromResources(path);
         if (texture == null) return null;
