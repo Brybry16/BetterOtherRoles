@@ -25,11 +25,7 @@
 	    <HintPath>libs\UniverseLib.IL2CPP.dll</HintPath>
 	  </Reference>
 	</ItemGroup>
-    <Target Name="CopyCustomContent" AfterTargets="AfterBuild" Condition="Exists('$(AmongUsLatest)/BepInEx/plugins/')">
-        <Message Text="Second occurrence" />
-        <Copy SourceFiles="$(ProjectDir)\bin\$(Configuration)\net6.0\TheOtherRoles.dll" DestinationFolder="$(AmongUsLatest)/BepInEx/plugins/" />
-    </Target>
     <Target Name="CopyPlugins" AfterTargets="AfterBuild">
-        <Copy SourceFiles="$(TargetPath)" DestinationFolder="E:\SteamLibrary\steamapps\common\Among Us - BOR-Update\BepInEx\plugins\BetterOtherRoles" />
+        <Copy SourceFiles="$(TargetPath)" DestinationFolder="E:\SteamLibrary\steamapps\common\Among Us - BOR v1.6.0-beta1\BepInEx\plugins\BetterOtherRoles" />
     </Target>
 </Project>

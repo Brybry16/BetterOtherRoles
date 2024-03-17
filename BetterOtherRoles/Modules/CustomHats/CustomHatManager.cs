@@ -281,7 +281,7 @@ public static class CustomHatManager
         List<string> hatFiles = new();
         Dictionary<string, List<string>> hatFilesSorted = new Dictionary<string, List<string>>();
         foreach (string resourceName in resourceNames) {
-            if (resourceName.Contains("TheOtherRoles.Resources.HorseHats.") && resourceName.Contains(".png")) {
+            if (resourceName.Contains("BetterOtherRoles.Resources.HorseHats.") && resourceName.Contains(".png")) {
                 hatFiles.Add(resourceName);
             }
         }

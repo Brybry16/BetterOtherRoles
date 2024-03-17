@@ -80,47 +80,7 @@ namespace BetterOtherRoles.Patches {
                     VersionHandshake.Instance.Share();
                 }
 
-                if (AmongUsClient.Instance.AmHost)
-                {
-                    __instance.StartButton.color = __instance.startLabelText.color = ((__instance.LastPlayerCount >= __instance.MinPlayers) ? Palette.EnabledColor : Palette.DisabledClear);
-                    __instance.GameStartText.transform.localPosition = __instance.StartButton.transform.localPosition;
-                    
-                    if (__instance.startState != GameStartManager.StartingStates.Countdown)
-                        UnityEngine.Object.Destroy(copiedStartButton);
-                    
-                    // Make starting info available to clients:
-                    if (startingTimer <= 0 && __instance.startState == GameStartManager.StartingStates.Countdown) {
-                        MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.SetGameStarting, Hazel.SendOption.Reliable, -1);
-                        AmongUsClient.Instance.FinishRpcImmediately(writer);
-                        RPCProcedure.setGameStarting();
-
-                        // Activate Stop-Button
-                        copiedStartButton = GameObject.Instantiate(__instance.StartButton.gameObject, __instance.StartButton.gameObject.transform.parent);
-                        copiedStartButton.transform.localPosition = __instance.StartButton.transform.localPosition;
-                        copiedStartButton.GetComponent<SpriteRenderer>().sprite = Helpers.loadSpriteFromResources("BetterOtherRoles.Resources.StopClean.png", 180f);
-                        copiedStartButton.SetActive(true);
-                        var startButtonText = copiedStartButton.GetComponentInChildren<TMPro.TextMeshPro>();
-                        startButtonText.text = "STOP";
-                        startButtonText.fontSize *= 0.8f;
-                        startButtonText.fontSizeMax = startButtonText.fontSize;
-                        startButtonText.gameObject.transform.localPosition = Vector3.zero;
-                        PassiveButton startButtonPassiveButton = copiedStartButton.GetComponent<PassiveButton>();
-
-                        void StopStartFunc() {
-                            __instance.ResetStartState();
-                            UnityEngine.Object.Destroy(copiedStartButton);
-                            startingTimer = 0;
-                        }
-                        startButtonPassiveButton.OnClick.AddListener((Action)(() => StopStartFunc()));
-                        __instance.StartCoroutine(Effects.Lerp(.1f, new System.Action<float>((p) => {
-                            startButtonText.text = "STOP";
-                        })));
-
-                    }
-                    if (__instance.startState == GameStartManager.StartingStates.Countdown)
-                        __instance.GameStartText.transform.localPosition = __instance.StartButton.transform.localPosition + Vector3.up * 0.6f;
-                }
-                else
+                if (!AmongUsClient.Instance.AmHost)
                 {
                     __instance.GameStartText.transform.localPosition = __instance.StartButton.transform.localPosition;
                     if (!__instance.GameStartText.text.StartsWith("Starting"))
@@ -133,7 +93,7 @@ namespace BetterOtherRoles.Patches {
                         // Activate Stop-Button
                         copiedStartButton = GameObject.Instantiate(__instance.StartButton.gameObject, __instance.StartButton.gameObject.transform.parent);
                         copiedStartButton.transform.localPosition = __instance.StartButton.transform.localPosition;
-                        copiedStartButton.GetComponent<SpriteRenderer>().sprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.StopClean.png", 180f);
+                        copiedStartButton.GetComponent<SpriteRenderer>().sprite = Helpers.loadSpriteFromResources("BetterOtherRoles.Resources.StopClean.png", 180f);
                         copiedStartButton.SetActive(true);
                         
                         var startButtonText = copiedStartButton.GetComponentInChildren<TMPro.TextMeshPro>();

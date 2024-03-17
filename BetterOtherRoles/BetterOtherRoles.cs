@@ -1162,7 +1162,7 @@ namespace BetterOtherRoles
         private static Sprite fungleVentSealedSprite;
         public static Sprite getFungleVentSealedSprite() {
             if (fungleVentSealedSprite) return fungleVentSealedSprite;
-            fungleVentSealedSprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.FungleVentSealed.png", 160f);
+            fungleVentSealedSprite = Helpers.loadSpriteFromResources("BetterOtherRoles.Resources.FungleVentSealed.png", 160f);
             return fungleVentSealedSprite;
         }
 
