@@ -1969,7 +1969,12 @@ namespace BetterOtherRoles
                 yield return new WaitForEndOfFrame();
             }
             if (!Player || !StuckPlayer) yield break;
+            
             var killAttempt = Helpers.checkMurderAttemptAndKill(Player, StuckPlayer, showAnimation: false);
+            
+            if (killAttempt == MurderAttemptResult.DelayStickyBomberKill)
+                yield break;
+            
             if (killAttempt == MurderAttemptResult.PerformKill)
             {
                 var writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.ShareGhostInfo, Hazel.SendOption.Reliable, -1);
@@ -1980,9 +1985,8 @@ namespace BetterOtherRoles
                 writer.Write(Player.PlayerId);
                 AmongUsClient.Instance.FinishRpcImmediately(writer);
                 GameHistory.overrideDeathReasonAndKiller(StuckPlayer, DeadPlayer.CustomDeathReason.StickyBomb, killer: StickyBomber.Player);
-
+                RpcGiveBomb(byte.MaxValue);
             }
-            RpcGiveBomb(byte.MaxValue);
         }
     }
 

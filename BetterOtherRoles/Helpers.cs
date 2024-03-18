@@ -23,6 +23,7 @@ namespace BetterOtherRoles {
         SuppressKill,
         BlankKill,
         DelayVampireKill,
+        DelayStickyBomberKill,
     }
 
     public enum CustomGamemodes {
@@ -514,6 +515,8 @@ namespace BetterOtherRoles {
             
             if (TransportationToolPatches.isUsingTransportation(target) && !blockRewind && killer == Vampire.vampire) {
                 return MurderAttemptResult.DelayVampireKill;
+            } else if (TransportationToolPatches.isUsingTransportation(target) && !blockRewind && killer == StickyBomber.Player) {
+                return MurderAttemptResult.DelayStickyBomberKill;
             } else if (TransportationToolPatches.isUsingTransportation(target))
                 return MurderAttemptResult.SuppressKill;
             
@@ -545,6 +548,22 @@ namespace BetterOtherRoles {
                         AmongUsClient.Instance.FinishRpcImmediately(writer);
                         RPCProcedure.vampireSetBitten(byte.MaxValue, byte.MaxValue);
                         MurderPlayer(killer, target, showAnimation);
+                    }
+                })));
+            } else if (murder == MurderAttemptResult.DelayStickyBomberKill) {
+                HudManager.Instance.StartCoroutine(Effects.Lerp(10f, new Action<float>((p) => { 
+                    if (!TransportationToolPatches.isUsingTransportation(target) && StickyBomber.StuckPlayer != null)
+                    {
+                        var writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.ShareGhostInfo, Hazel.SendOption.Reliable, -1);
+                        writer.Write(CachedPlayer.LocalPlayer.PlayerId);
+                        writer.Write((byte)RPCProcedure.GhostInfoTypes.DeathReasonAndKiller);
+                        writer.Write(StickyBomber.StuckPlayer.PlayerId);
+                        writer.Write((byte)DeadPlayer.CustomDeathReason.StickyBomb);
+                        writer.Write(StickyBomber.Player.PlayerId);
+                        AmongUsClient.Instance.FinishRpcImmediately(writer);
+                        GameHistory.overrideDeathReasonAndKiller(StickyBomber.StuckPlayer, DeadPlayer.CustomDeathReason.StickyBomb, killer: StickyBomber.Player);
+                        MurderPlayer(killer, target, showAnimation);
+                        StickyBomber.RpcGiveBomb(byte.MaxValue);
                     }
                 })));
             }
