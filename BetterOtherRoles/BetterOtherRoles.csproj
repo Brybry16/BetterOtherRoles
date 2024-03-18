@@ -26,6 +26,6 @@
 	  </Reference>
 	</ItemGroup>
     <Target Name="CopyPlugins" AfterTargets="AfterBuild">
-        <Copy SourceFiles="$(TargetPath)" DestinationFolder="E:\SteamLibrary\steamapps\common\Among Us - BOR v1.6.0-beta1\BepInEx\plugins\BetterOtherRoles" />
+        <Copy SourceFiles="$(TargetPath)" DestinationFolder="E:\SteamLibrary\steamapps\common\Among Us - BOR v1.6.0-beta\BepInEx\plugins\BetterOtherRoles" />
     </Target>
 </Project>
