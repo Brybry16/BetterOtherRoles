@@ -30,6 +30,8 @@ namespace BetterOtherRoles {
         public static CustomOption BetterSkeldEnableAdmin;
         public static CustomOption BetterSkeldEnableVitals;
 
+        public static CustomOption DisableVentCleaningTask;
+
         public static CustomOption anyPlayerCanStopStart;
         public static CustomOption enableEventMode;
 
@@ -472,6 +474,8 @@ namespace BetterOtherRoles {
             EnableBetterSkeld = CustomOption.Create(5017, Types.General, "Better Skeld", false, isHeader: true);
             BetterSkeldEnableAdmin = CustomOption.Create(5018, Types.General, "Enable Admin Table", false, EnableBetterSkeld);
             BetterSkeldEnableVitals = CustomOption.Create(5019, Types.General, "Enable Vitals", false, EnableBetterSkeld);
+
+            DisableVentCleaningTask = CustomOption.Create(5032, Types.General, "Disable Vent Cleaning Task", false, isHeader: true);
 
             mafiaSpawnRate = CustomOption.Create(18, Types.Impostor, cs(Janitor.color, "Mafia"), rates, null, true);
             janitorCooldown = CustomOption.Create(19, Types.Impostor, "Janitor Cooldown", 30f, 10f, 60f, 2.5f, mafiaSpawnRate, suffix: "s");

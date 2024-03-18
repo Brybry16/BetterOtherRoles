@@ -6,6 +6,7 @@ using static BetterOtherRoles.BetterOtherRoles;
 using UnityEngine;
 using BetterOtherRoles.CustomGameModes;
 using AmongUs.GameOptions;
+using Il2CppSystem.Collections.Generic;
 
 namespace BetterOtherRoles.Patches {
 
@@ -154,6 +155,28 @@ namespace BetterOtherRoles.Patches {
             GameOptionsManager.Instance.currentNormalGameOptions.ImpostorLightMod = originalNumImpVisionOption;
             GameOptionsManager.Instance.currentNormalGameOptions.CrewLightMod = originalNumCrewVisionOption;
             GameOptionsManager.Instance.currentNormalGameOptions.KillCooldown = originalNumKillCooldownOption;
+        }
+
+        
+        /*
+         * Allows to get the "Clean Vent" Task out of the pool.
+         * This task is bugged in Among Us 2024.3.5
+         */
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(ShipStatus), nameof(ShipStatus.AddTasksFromList))]
+        public static void Prefix2(ShipStatus __instance, ref int start, int count, List<byte> tasks, HashSet<TaskTypes> usedTaskTypes, List<NormalPlayerTask> unusedTasks)
+        {
+            if (!CustomOptionHolder.DisableVentCleaningTask.getBool())
+                return;
+            
+            for (int i = 0; i < unusedTasks.Count; i++)
+            {
+                if (unusedTasks._items[i]?.TaskType == TaskTypes.VentCleaning)
+                {
+                    unusedTasks.Remove(unusedTasks._items[i]);
+                    return;
+                }
+            }
         }
     }
 }
