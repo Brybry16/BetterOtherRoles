@@ -335,7 +335,7 @@ namespace BetterOtherRoles {
         }
 
         public static bool hidePlayerName(PlayerControl source, PlayerControl target) {
-            if (Camouflager.camouflageTimer > 0f || Helpers.MushroomSabotageActive()) return true; // No names are visible
+            if (Camouflager.camouflageTimer > 0f || (Helpers.MushroomSabotageActive() && !source.Data.Role.IsImpostor)) return true; // No names are visible
             if (Patches.SurveillanceMinigamePatch.nightVisionIsActive) return true;
             else if (Ninja.isInvisble && Ninja.ninja == target) return true;
             else if (!TORMapOptions.hidePlayerNames) return false; // All names are visible

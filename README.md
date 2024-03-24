@@ -1,5 +1,5 @@
 ![eisbison banner](./BetterOtherRoles/Resources/Banner.png)
-<p align="center"><a href="https://github.com/EnoPM/BetterOtherRoles/releases/latest"><img src="https://badgen.net/github/release/enopm/betterotherroles"></a></p>
+<p align="center"><a href="https://github.com/Brybry16/BetterOtherRoles/releases/latest"><img src="https://badgen.net/github/release/brybry16/betterotherroles"></a></p>
 
 
 This mod is not affiliated with Among Us or Innersloth LLC, and the content contained therein is not endorsed or otherwise sponsored by Innersloth LLC. Portions of the materials contained herein are property of Innersloth LLC. © Innersloth LLC.</p>
@@ -37,14 +37,20 @@ Even more roles are coming soon. :)
 The [Role Assignment](#role-assignment) sections explains how the roles are being distributed among the players.
 
 # Releases
-| Among Us - Version| Mod Version | Link |
-|----------|-------------|-----------------|
-| 2023.10.24| v1.5.2      | [Download](https://github.com/EnoPM/BetterOtherRoles/releases/download/v1.5.2/BetterOtherRoles.v1.5.2.zip)
-| 2023.07.12s| v1.4.4      | [Download](https://github.com/EnoPM/BetterOtherRoles/releases/download/v1.4.4/BetterOtherRoles.v1.4.4.zip)
+| Among Us - Version | Mod Version | Link |
+|--------------------|-------------|-----------------|
+| 2024.3.5           | v1.6.0      | [Download](https://github.com/Brybry16/BetterOtherRoles/releases/download/v1.6.0/BetterOtherRoles.v1.6.0.zip)
+| 2023.10.24         | v1.5.2      | [Download](https://github.com/EnoPM/BetterOtherRoles/releases/download/v1.5.2/BetterOtherRoles.v1.5.2.zip)
+| 2023.07.12s        | v1.4.4      | [Download](https://github.com/EnoPM/BetterOtherRoles/releases/download/v1.4.4/BetterOtherRoles.v1.4.4.zip)
 
 # Changelog
 <details>
   <summary>Click to show the Changelog</summary>
+
+**Version 1.6.x**
+- Updated to Among Us version 2024.3.5
+- Updated up to The Other Roles 4.5.2
+- Fixed Impostor not seeing names when Mushroom Mixup Sabotage is active
 
 **Version 1.5.x**
 - Updated to Among Us version 2023.10.24
@@ -61,7 +67,7 @@ The [Role Assignment](#role-assignment) sections explains how the roles are bein
 # Installation
 
 ## Windows Installation Steam
-1. Download the newest [release](https://github.com/EnoPM/BetterOtherRoles/releases/latest)
+1. Download the newest [release](https://github.com/Brybry16/BetterOtherRoles/releases/latest)
 2. Find the folder of your game. You can right click on the game in your library, a menu will appear, click on properties, local data, browse
 3. Go back one folder to common and make a copy of your Among Us game folder and paste it somewhere on the same drive.
 4. Now unzip and drag or extract the files from the .zip into your Among Us game folder that you just copied, at the `.exe` level (just into the folder).
@@ -70,7 +76,7 @@ The [Role Assignment](#role-assignment) sections explains how the roles are bein
 Not working? You might want to install the dependency [vc_redist](https://aka.ms/vs/16/release/vc_redist.x86.exe)
 
 ## Windows Installation Epic
-1. Download the newest [release](https://github.com/EnoPM/BetterOtherRoles/releases/latest)
+1. Download the newest [release](https://github.com/Brybry16/BetterOtherRoles/releases/latest)
 2. Find the folder of your game. Should be stored in "Epic/AmongUs" (wherever you installed Epic on your PC)
 3. Now unzip and drag or extract the files from the .zip into the original Epic Among Us game folder.
 4. Run the game by starting the game in your Epic Games launcher (the first launch might take a while).
@@ -81,7 +87,7 @@ Not working? You might want to install the dependency [vc_redist](https://aka.ms
 
 ## Linux Installation
 1. Install Among Us via Steam
-2. Download newest [release](https://github.com/EnoPM/BetterOtherRoles/releases/latest) and extract it to ~/.steam/steam/steamapps/common/Among Us
+2. Download newest [release](https://github.com/Brybry16/BetterOtherRoles/releases/latest) and extract it to ~/.steam/steam/steamapps/common/Among Us
 3. Enable winhttp.dll via the proton winecfg (https://docs.bepinex.dev/articles/advanced/proton_wine.html)
 4. Launch the game via Steam
 
@@ -1471,14 +1477,14 @@ Each Hunter action or finished Crew task will lower the timer by a configurable 
 | Time The Hunter Needs To Wait | -
 
 # License
-EnoPM/BetterOtherRoles is licensed under the
+Brybry16/BetterOtherRoles is licensed under the
 
-[GNU General Public License v3.0](https://github.com/EnoPM/BetterOtherRoles/blob/main/LICENSE)
+[GNU General Public License v3.0](https://github.com/Brybry16/BetterOtherRoles/blob/main/LICENSE)
 
 Permissions of this strong copyleft license are conditioned on making available **complete source code of licensed works and modifications**, which include larger works using a licensed work, under the same license. Copyright and license notices must be preserved. Contributors provide an express grant of patent rights.
 
 # Bugs, suggestions and requests
-If you found any bugs, have an idea for a new role or any other request, [open an issue](https://github.com/EnoPM/BetterOtherRoles/issues/new/choose).
+If you found any bugs, have an idea for a new role or any other request, [open an issue](https://github.com/Brybry16/BetterOtherRoles/issues/new/choose).
 
 # Credits
 The source code of this mod is based on [TheOtherRoles](https://github.com/TheOtherRolesAU/TheOtherRoles) mod
