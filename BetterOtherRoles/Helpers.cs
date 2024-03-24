@@ -147,7 +147,7 @@ namespace BetterOtherRoles {
         public static void HandleStickyBomberExplodeOnBodyReport()
         {
             if (StickyBomber.Player == null || StickyBomber.StuckPlayer == null) return;
-            Helpers.checkMurderAttemptAndKill(StickyBomber.Player, StickyBomber.StuckPlayer, showAnimation: false);
+            Helpers.checkMurderAttemptAndKill(StickyBomber.Player, StickyBomber.StuckPlayer, true, false);
             var writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.ShareGhostInfo, Hazel.SendOption.Reliable, -1);
             writer.Write(CachedPlayer.LocalPlayer.PlayerId);
             writer.Write((byte)RPCProcedure.GhostInfoTypes.DeathReasonAndKiller);
