@@ -16,7 +16,7 @@ public static class MedScanMinigameWalkToPadPatches
     [HarmonyPrefix]
     private static bool MoveNextPrefix(MedScanMinigame._WalkToPad_d__16 __instance)
     {
-        if (!RandomizeScanPlayerPosition.getBool() || (ShipStatus.Instance && ShipStatus.Instance.Type != ShipStatus.MapType.Pb)) return true;
+        if (!RandomizeScanPlayerPosition.getBool() || !(Helpers.isPolus() || Helpers.isMira() || Helpers.isSkeld())) return true;
         var minigame = __instance.__4__this;
         minigame.StartCoroutine(WalkToPadEnumerator(minigame));
         
@@ -25,8 +25,17 @@ public static class MedScanMinigameWalkToPadPatches
     
     private static IEnumerator WalkToPadEnumerator(MedScanMinigame minigame)
     {
-        var panel = UnityEngine.Object.FindObjectsOfType<GameObject>()
-            .FirstOrDefault(o => o.name == "panel_medplatform");
+        GameObject panel = null;
+        if (Helpers.isPolus() || (ShipStatus.Instance && ShipStatus.Instance.Type == ShipStatus.MapType.Pb))
+        {
+            panel = Object.FindObjectsOfType<GameObject>()
+                .FirstOrDefault(o => o.name == "panel_medplatform");
+        }
+        else if (Helpers.isSkeld() || Helpers.isMira())
+        {
+            panel = Object.FindObjectsOfType<GameObject>()
+                .FirstOrDefault(o => o.name == "MedScanner");
+        }
 
         if (panel == null || Camera.main == null) yield break;
                 
