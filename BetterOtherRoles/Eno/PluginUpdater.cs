@@ -29,7 +29,7 @@ public class PluginUpdater : MonoBehaviour
     {
         if (Instance) Destroy(Instance);
         Instance = this;
-        foreach (var file in Directory.GetFiles(Path.Combine(Paths.PluginPath, "BetterOtherRoles"), "*.old"))
+        foreach (var file in Directory.GetFiles(Helpers.getAssemblyPath(), "*.old"))
         {
             File.Delete(file);
         }
@@ -152,7 +152,7 @@ public class PluginUpdater : MonoBehaviour
         
         SetLoadingText($"Installing {BetterOtherRolesPlugin.Name} {release.Tag}...");
 
-        var filePath = Path.Combine(Paths.PluginPath, "BetterOtherRoles", asset.Name);
+        var filePath = Path.Combine(Helpers.getAssemblyPath(), asset.Name);
 
         if (File.Exists(filePath + ".old")) File.Delete(filePath + "old");
         if (File.Exists(filePath)) File.Move(filePath, filePath + ".old");

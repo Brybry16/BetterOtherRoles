@@ -20,7 +20,7 @@ namespace BetterOtherRoles.Patches;
 [HarmonyPatch(typeof(ServerManager))]
 public static class ServerManagerPatches
 {
-    private static readonly string RegionFileJson = Path.Combine(Paths.PluginPath, "BetterOtherRoles", "Regions.json");
+    private static readonly string RegionFileJson = Path.Combine(Helpers.getAssemblyPath(), "Regions.json");
 
     [HarmonyPatch(nameof(ServerManager.LoadServers))]
     [HarmonyPrefix]

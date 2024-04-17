@@ -12,6 +12,7 @@ using Hazel;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using System.IO;
 using UnityEngine;
 using BetterOtherRoles.Modules;
 using BetterOtherRoles.Players;
@@ -22,6 +23,8 @@ using AmongUs.Data;
 using BetterOtherRoles.Modules.CustomHats;
 using BetterOtherRoles.UI;
 using BetterOtherRoles.Utilities.Attributes;
+using UnityEngine.IO;
+using File = System.IO.File;
 
 namespace BetterOtherRoles
 {
@@ -32,7 +35,7 @@ namespace BetterOtherRoles
     {
         public const string Name = "Better Other Roles";
         public const string Id = "betterohterroles.eno.pm";
-        public const string VersionString = "1.6.0";
+        public const string VersionString = "1.6.1";
         public const int betaNum = 0;
         
         public static Version Version = Version.Parse(VersionString);
@@ -72,6 +75,13 @@ namespace BetterOtherRoles
             ShowVentsOnMap = Config.Bind("Custom", "Show vent positions on minimap", false);
 
             DebugMode = Config.Bind("Custom", "Enable Debug Mode", "false");
+            
+            if(Directory.GetFiles(Paths.PluginPath, "UniverseLib*", SearchOption.AllDirectories).FirstOrDefault() == null)
+            {
+                string libPath = Path.Combine(Helpers.getAssemblyPath(), "UniverseLib.IL2CPP.dll");
+                Helpers.writeResourceToFile("BetterOtherRoles.Resources.Files.UniverseLib.IL2CPP.dll", libPath);
+            }
+            
             Harmony.PatchAll();
             
             CustomOptionHolder.Load();

@@ -14,6 +14,7 @@ using BetterOtherRoles.Utilities;
 using System.Threading.Tasks;
 using BetterOtherRoles.CustomGameModes;
 using AmongUs.GameOptions;
+using BepInEx;
 using BetterOtherRoles.Patches;
 
 namespace BetterOtherRoles {
@@ -37,6 +38,23 @@ namespace BetterOtherRoles {
 
         public static Dictionary<string, Sprite> CachedSprites = new();
 
+        public static void writeResourceToFile(string resourcePath, string fileName)
+        {
+            using (var resource = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourcePath))
+            {
+                using (var file = new FileStream(fileName, FileMode.Create, FileAccess.Write))
+                {
+                    resource.CopyTo(file);
+                }
+            }
+        }
+
+        public static string getAssemblyPath()
+        {
+            return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ??
+                                         Path.Combine(Paths.PluginPath, "BetterOtherRoles");
+        }
+        
         public static Sprite loadSpriteFromResources(string path, float pixelsPerUnit, bool cache=true) {
             try
             {
