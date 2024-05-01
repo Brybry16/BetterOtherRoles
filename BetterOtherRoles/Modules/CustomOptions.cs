@@ -585,6 +585,7 @@ class GameOptionsMenuStartPatch
         );
 
         adaptTaskCount(__instance);
+        adaptCrewLightIncrement(__instance);
     }
 
     private static void createGuesserTabs(GameOptionsMenu __instance)
@@ -750,6 +751,7 @@ class GameOptionsMenuStartPatch
         );
 
         adaptTaskCount(__instance);
+        adaptCrewLightIncrement(__instance);
     }
 
     private static void createHideNSeekTabs(GameOptionsMenu __instance)
@@ -1016,6 +1018,13 @@ class GameOptionsMenuStartPatch
             menus[i].Children = options[i].ToArray();
             settings[i].gameObject.SetActive(false);
         }
+    }
+
+    private static void adaptCrewLightIncrement(GameOptionsMenu __instance)
+    {
+        var crewLightModOption =
+            __instance.Children.FirstOrDefault(x => x.name == "CrewmateVision").TryCast<NumberOption>();
+        if (crewLightModOption != null) crewLightModOption.Increment = 0.125f;
     }
 
     private static void adaptTaskCount(GameOptionsMenu __instance)
