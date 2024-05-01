@@ -12,6 +12,7 @@ using BetterOtherRoles.Utilities;
 using BetterOtherRoles.Objects;
 using BetterOtherRoles.CustomGameModes;
 using AmongUs.GameOptions;
+using UnityEngine.Diagnostics;
 
 namespace BetterOtherRoles.Patches {
 
@@ -280,7 +281,10 @@ namespace BetterOtherRoles.Patches {
         public static bool Prefix(ref float __result, Console __instance, [HarmonyArgument(0)] GameData.PlayerInfo pc, [HarmonyArgument(1)] out bool canUse, [HarmonyArgument(2)] out bool couldUse) {
             canUse = couldUse = false;
             if (Swapper.swapper != null && Swapper.swapper == CachedPlayer.LocalPlayer.PlayerControl)
+            {
                 return !__instance.TaskTypes.Any(x => x == TaskTypes.FixLights || x == TaskTypes.FixComms);
+            }
+
             if (__instance.AllowImpostor) return true;
             if (!Helpers.hasFakeTasks(pc.Object)) return true;
             __result = float.MaxValue;
@@ -292,7 +296,7 @@ namespace BetterOtherRoles.Patches {
     class CommsMinigameBeginPatch {
         static void Postfix(TuneRadioMinigame __instance) {
             // Block Swapper from fixing comms. Still looking for a better way to do this, but deleting the task doesn't seem like a viable option since then the camera, admin table, ... work while comms are out
-            if (Swapper.swapper != null && Swapper.swapper == CachedPlayer.LocalPlayer.PlayerControl) {
+            if (Swapper.swapper != null && Swapper.swapper == CachedPlayer.LocalPlayer.PlayerControl && !Helpers.isFungle()) {
                 __instance.Close();
             }
         }
