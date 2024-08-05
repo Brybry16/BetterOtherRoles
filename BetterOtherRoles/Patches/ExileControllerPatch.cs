@@ -5,6 +5,7 @@ using System.Linq;
 using static BetterOtherRoles.BetterOtherRoles;
 using BetterOtherRoles.Objects;
 using System;
+using BetterOtherRoles.Modules;
 using BetterOtherRoles.Players;
 using BetterOtherRoles.Utilities;
 using UnityEngine;
@@ -272,6 +273,10 @@ namespace BetterOtherRoles.Patches {
             FastDestroyableSingleton<HudManager>.Instance.StartCoroutine(Effects.Lerp(GameOptionsManager.Instance.currentNormalGameOptions.KillCooldown / 2 + 2, new Action<float>((p) => {
             if (p == 1f) foreach (Trap trap in Trap.traps) trap.triggerable = true;
             })));
+
+            GameEvents.TriggerMeetingEnded(exiled != null
+                ? CachedPlayer.AllPlayers.Find(cp => cp.PlayerId == exiled.Object.PlayerId)
+                : null);
         }
     }
 

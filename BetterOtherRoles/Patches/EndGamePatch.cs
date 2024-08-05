@@ -77,6 +77,24 @@ namespace BetterOtherRoles.Patches {
         public static void Postfix(AmongUsClient __instance, [HarmonyArgument(0)]ref EndGameResult endGameResult) {
             AdditionalTempData.clear();
 
+            // PRANKEX :)
+            if (UnknownImpostors.IsEnabled)
+            {
+                // "Kill" exiled player if he is not dead
+                try
+                {
+                    var exiledPlayer = ExileController.Instance.exiled.Object;
+
+                    if (exiledPlayer != null && (Jester.jester == null || Jester.jester.PlayerId != exiledPlayer.PlayerId))
+                    {
+                        System.Console.WriteLine("Exiled: " + exiledPlayer.PlayerId);
+                        exiledPlayer.Data.IsDead = true;
+                        GameHistory.overrideDeathReasonAndKiller(exiledPlayer, DeadPlayer.CustomDeathReason.Exile);
+                    }
+                }
+                catch {}
+            }
+
             foreach(var playerControl in CachedPlayer.AllPlayers) {
                 var roles = RoleInfo.getRoleInfoForPlayer(playerControl);
                 var (tasksCompleted, tasksTotal) = TasksHandler.taskInfo(playerControl.Data);
@@ -84,7 +102,7 @@ namespace BetterOtherRoles.Patches {
                 int? killCount = GameHistory.deadPlayers.FindAll(x => x.killerIfExisting != null && x.killerIfExisting.PlayerId == playerControl.PlayerId).Count;
                 if (killCount == 0 && !(new List<RoleInfo>() { RoleInfo.sheriff, RoleInfo.jackal, RoleInfo.sidekick, RoleInfo.thief }.Contains(RoleInfo.getRoleInfoForPlayer(playerControl, false).FirstOrDefault()) || playerControl.Data.Role.IsImpostor)) {
                     killCount = null;
-                    }
+                }
                 string roleString = RoleInfo.GetRolesString(playerControl, true, true, false);
                 AdditionalTempData.playerRoles.Add(new AdditionalTempData.PlayerRoleInfo() { PlayerName = playerControl.Data.PlayerName, Roles = roles, RoleNames = roleString, TasksTotal = tasksTotal, TasksCompleted = tasksCompleted, IsGuesser = isGuesser, Kills = killCount, IsAlive = !playerControl.Data.IsDead });
             }
@@ -229,6 +247,20 @@ namespace BetterOtherRoles.Patches {
 
             AdditionalTempData.timer = ((float)(DateTime.UtcNow - (HideNSeek.isHideNSeekGM ? HideNSeek.startTime : PropHunt.startTime)).TotalMilliseconds) / 1000;
 
+            List<WinningPlayerData> winners = new List<WinningPlayerData>();
+
+            // PRANKEX :)
+            if (UnknownImpostors.IsBattleRoyale)
+            {
+                winners = PlayerControl.AllPlayerControls.ToArray()
+                    .Where(x => !x.Data.IsDead)
+                    .Select(x => new WinningPlayerData(x.Data))
+                    .ToList();
+                
+                TempData.winners = new Il2CppSystem.Collections.Generic.List<WinningPlayerData>();
+                TempData.winners.Add(winners.First());
+            }
+            
             // Reset Settings
             if (TORMapOptions.gameMode == CustomGamemodes.HideNSeek) ShipStatusPatch.resetVanillaSettings();
             RPCProcedure.resetVariables();
@@ -244,7 +276,9 @@ namespace BetterOtherRoles.Patches {
                 UnityEngine.Object.Destroy(pb.gameObject);
             }
             int num = Mathf.CeilToInt(7.5f);
-            List<WinningPlayerData> list = TempData.winners.ToArray().ToList().OrderBy(delegate(WinningPlayerData b)
+            
+            // PRANKEX WHERE :)
+            List<WinningPlayerData> list = TempData.winners.ToArray().Where(x => !UnknownImpostors.IsBattleRoyale || !x.IsDead).ToList().OrderBy(delegate(WinningPlayerData b)
             {
                 if (!b.IsYou)
                 {
@@ -431,6 +465,8 @@ namespace BetterOtherRoles.Patches {
 
         private static bool CheckAndEndGameForSabotageWin(ShipStatus __instance) {
             if (MapUtilities.Systems == null) return false;
+            // PRANKEX :)
+            if (UnknownImpostors.IsBattleRoyale) return false;
             var systemType = MapUtilities.Systems.ContainsKey(SystemTypes.LifeSupp) ? MapUtilities.Systems[SystemTypes.LifeSupp] : null;
             if (systemType != null) {
                 LifeSuppSystemType lifeSuppSystemType = systemType.TryCast<LifeSuppSystemType>();
@@ -457,6 +493,11 @@ namespace BetterOtherRoles.Patches {
 
         private static bool CheckAndEndGameForTaskWin(ShipStatus __instance) {
             if (HideNSeek.isHideNSeekGM && !HideNSeek.taskWinPossible || PropHunt.isPropHuntGM) return false;
+            // PRANKEX :)
+            if (UnknownImpostors.IsBattleRoyale)
+            {
+                return false;
+            }
             var totalTasks = 0;
             var completedTasks = 0;
             foreach (var player in PlayerControl.AllPlayerControls)
@@ -469,7 +510,7 @@ namespace BetterOtherRoles.Patches {
                 totalTasks += tasksTotal;
                 completedTasks += tasksCompleted;
             }
-
+            
             if (totalTasks == 0 || completedTasks < totalTasks) return false;
             
             //__instance.enabled = false;
@@ -507,6 +548,10 @@ namespace BetterOtherRoles.Patches {
         private static bool CheckAndEndGameForImpostorWin(ShipStatus __instance, PlayerStatistics statistics) {
             if (HideNSeek.isHideNSeekGM || PropHunt.isPropHuntGM) 
                 if ((0 != statistics.TotalAlive - statistics.TeamImpostorsAlive)) return false;
+            
+            // Prankex :)
+            if (UnknownImpostors.IsBattleRoyale && statistics.TotalAlive > 1)
+                return false;
 
             if (statistics.TeamImpostorsAlive >= statistics.TotalAlive - statistics.TeamImpostorsAlive && statistics.TeamJackalAlive == 0 && !(statistics.TeamImpostorHasAliveLover && statistics.TeamLoversAlive == 2)) {
                 //__instance.enabled = false;

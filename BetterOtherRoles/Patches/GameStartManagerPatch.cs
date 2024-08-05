@@ -9,6 +9,7 @@ using BetterOtherRoles.Players;
 using BetterOtherRoles.Utilities;
 using System.Linq;
 using BetterOtherRoles.Eno;
+using BetterOtherRoles.Modules;
 
 namespace BetterOtherRoles.Patches {
     public class GameStartManagerPatch  {
@@ -241,6 +242,11 @@ namespace BetterOtherRoles.Patches {
                         AmongUsClient.Instance.FinishRpcImmediately(writer);
                         RPCProcedure.dynamicMapOption(chosenMapId);
                     }
+                    
+                    MessageWriter dingusWriter = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.HostUseDingusRelease, Hazel.SendOption.Reliable, -1);
+                    dingusWriter.Write(DevConfig.IsDingusRelease);
+                    AmongUsClient.Instance.FinishRpcImmediately(dingusWriter);
+                    RPCProcedure.setHostDingusRelease(DevConfig.IsDingusRelease);
                 }
                 
                 return continueStart;

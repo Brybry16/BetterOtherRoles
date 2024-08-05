@@ -119,7 +119,7 @@ namespace BetterOtherRoles.Patches
 				                                            PlayerControl.LocalPlayer.Data.IsDead)))
 					continue; //for trickster vents
 
-				if (!BetterOtherRolesPlugin.ShowVentsOnMap.Value)
+				if (!TORMapOptions.showVentsOnMap)
 				{
 					if (mapIcons.Count > 0)
 					{

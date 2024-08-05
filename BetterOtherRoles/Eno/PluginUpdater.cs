@@ -103,7 +103,8 @@ public class PluginUpdater : MonoBehaviour
             yield break;
         }
 
-        Releases = JsonSerializer.Deserialize<List<GithubRelease>>(www.downloadHandler.text);
+        Releases = JsonSerializer.Deserialize<List<GithubRelease>>(www.downloadHandler.text)
+            .Where(x => TORMapOptions.getBetaReleases || !x.Prerelease).ToList();
         www.downloadHandler.Dispose();
         www.Dispose();
         Releases.Sort(SortReleases);

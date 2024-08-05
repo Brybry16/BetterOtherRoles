@@ -98,6 +98,12 @@ public class LocalOptionsPanel : WrappedPanel
         {
             TORMapOptions.showVentsOnMap = value;
         };
+        
+        var getBetaReleases = new LocalOptionEditor("Get Beta Releases", this, content, BetterOtherRolesPlugin.GetBetaReleases);
+        getBetaReleases.OnUpdated += value =>
+        {
+            TORMapOptions.getBetaReleases = value;
+        };
     }
     
     public override void SetActive(bool active)

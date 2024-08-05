@@ -152,13 +152,17 @@ namespace BetterOtherRoles.Patches {
     [HarmonyPatch]
     class IntroPatch {
         public static void setupIntroTeamIcons(IntroCutscene __instance, ref  Il2CppSystem.Collections.Generic.List<PlayerControl> yourTeam) {
+            
             // Intro solo teams
-            if (Helpers.isNeutral(CachedPlayer.LocalPlayer.PlayerControl)) {
+            if (Helpers.isNeutral(CachedPlayer.LocalPlayer.PlayerControl) || UnknownImpostors.IsOtherImpostorUnknown) {
                 var soloTeam = new Il2CppSystem.Collections.Generic.List<PlayerControl>();
                 soloTeam.Add(CachedPlayer.LocalPlayer.PlayerControl);
                 yourTeam = soloTeam;
             }
-
+            
+            if (UnknownImpostors.IsOtherImpostorUnknown)
+                return;
+            
             // Add the Spy to the Impostor team (for the Impostors)
             if (Spy.spy != null && CachedPlayer.LocalPlayer.Data.Role.IsImpostor) {
                 List<PlayerControl> players = PlayerControl.AllPlayerControls.ToArray().ToList().OrderBy(x => Guid.NewGuid()).ToList();

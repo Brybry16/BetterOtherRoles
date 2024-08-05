@@ -444,6 +444,10 @@ namespace BetterOtherRoles.Patches {
                     target = setTarget(true, true, new List<PlayerControl>() { Spy.spy, Sidekick.wasTeamRed ? Sidekick.sidekick : null, Jackal.wasTeamRed ? Jackal.jackal : null});
                 }
             }
+            else if (UnknownImpostors.IsEnabled)
+            {
+                target = setTarget();
+            }
             else {
                 target = setTarget(true, true, new List<PlayerControl>() { Sidekick.wasImpostor ? Sidekick.sidekick : null, Jackal.wasImpostor ? Jackal.jackal : null});
             }

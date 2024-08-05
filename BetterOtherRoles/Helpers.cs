@@ -537,6 +537,14 @@ namespace BetterOtherRoles {
                 return MurderAttemptResult.DelayStickyBomberKill;
             } else if (TransportationToolPatches.isUsingTransportation(target))
                 return MurderAttemptResult.SuppressKill;
+
+            if (UnknownImpostors.IsEnabled &&
+                !UnknownImpostors.CanImpostorsKillTeammate &&
+                target.Data.Role.IsImpostor)
+            {
+                SoundEffectsManager.play("fail");
+                return MurderAttemptResult.SuppressKill;
+            }
             
             return MurderAttemptResult.PerformKill;
         }

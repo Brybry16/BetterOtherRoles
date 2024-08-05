@@ -35,7 +35,7 @@ namespace BetterOtherRoles
     {
         public const string Name = "Better Other Roles";
         public const string Id = "betterohterroles.eno.pm";
-        public const string VersionString = "1.6.2";
+        public const string VersionString = "1.6.4";
         public const int betaNum = 0;
         
         public static Version Version = Version.Parse(VersionString);
@@ -56,6 +56,7 @@ namespace BetterOtherRoles
         public static ConfigEntry<bool> EnableSoundEffects { get; set; }
         public static ConfigEntry<bool> EnableHorseMode { get; set; }
         public static ConfigEntry<bool> ShowVentsOnMap { get; set; }
+        public static ConfigEntry<bool> GetBetaReleases { get; set; }
         public static ConfigEntry<string> ShowPopUpVersion { get; set; }
 
         public override void Load() {
@@ -72,7 +73,8 @@ namespace BetterOtherRoles
             EnableSoundEffects = Config.Bind("Custom", "Enable Sound Effects", true);
             EnableHorseMode = Config.Bind("Custom", "Enable Horse Mode", false);
             ShowPopUpVersion = Config.Bind("Custom", "Show PopUp", "0");
-            ShowVentsOnMap = Config.Bind("Custom", "Show vent positions on minimap", false);
+            ShowVentsOnMap = Config.Bind("Custom", "Show vent positions on minimap", true);
+            GetBetaReleases = Config.Bind("Custom", "Get Beta Releases", false);
 
             DebugMode = Config.Bind("Custom", "Enable Debug Mode", "false");
             

@@ -38,7 +38,17 @@ namespace BetterOtherRoles.Patches {
                     var nameText = player.cosmetics.nameText;
                 
                     nameText.text = Helpers.hidePlayerName(localPlayer, player) ? "" : playerName;
-                    nameText.color = color = amImpostor && data.Role.IsImpostor ? Palette.ImpostorRed : Color.white;
+                    
+                    // PRANKEX ? :)
+                    if (UnknownImpostors.IsEnabled && amImpostor)
+                    {
+                        nameText.color = color = Color.white;
+                    }
+                    else
+                    {
+                        nameText.color = color = amImpostor && data.Role.IsImpostor ? Palette.ImpostorRed : Color.white;
+                    }
+                    
                     nameText.color = nameText.color.SetAlpha(Chameleon.visibility(player.PlayerId));
                 }
                 else

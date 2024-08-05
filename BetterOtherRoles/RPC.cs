@@ -103,6 +103,7 @@ namespace BetterOtherRoles
         SetGameStarting,
         ShareGamemode,
         StopStart,
+        HostUseDingusRelease,
 
         // Role functionality
 
@@ -487,6 +488,11 @@ namespace BetterOtherRoles
 
         public static void setGameStarting() {
             GameStartManagerPatch.GameStartManagerUpdatePatch.startingTimer = 5f;
+        }
+
+        public static void setHostDingusRelease(bool isDingusRelease)
+        {
+            UnknownImpostors.IsHostDingusRelease = isDingusRelease;
         }
 
         // Role functionality
@@ -1368,6 +1374,9 @@ namespace BetterOtherRoles
                     break;
                 case (byte)CustomRPC.SetGameStarting:
                     RPCProcedure.setGameStarting();
+                    break;
+                case (byte)CustomRPC.HostUseDingusRelease:
+                    RPCProcedure.setHostDingusRelease(reader.ReadBoolean());
                     break;
 
                 // Role functionality

@@ -9,6 +9,7 @@ using BetterOtherRoles.Players;
 using BetterOtherRoles.Utilities;
 using static BetterOtherRoles.BetterOtherRoles;
 using BetterOtherRoles.CustomGameModes;
+using BetterOtherRoles.Modules;
 
 namespace BetterOtherRoles.Patches {
     [HarmonyPatch(typeof(RoleOptionsCollectionV07), nameof(RoleOptionsCollectionV07.GetNumPerGame))]
@@ -25,7 +26,14 @@ namespace BetterOtherRoles.Patches {
                 int impCount = TORMapOptions.gameMode == CustomGamemodes.HideNSeek ? Mathf.RoundToInt(CustomOptionHolder.hideNSeekHunterCount.getFloat()) : CustomOptionHolder.propHuntNumberOfHunters.getQuantity();
                 __result = impCount; ; // Set Imp Num
             } else if (GameOptionsManager.Instance.CurrentGameOptions.GameMode == GameModes.Normal) {  // Ignore Vanilla impostor limits in TOR Games.
-                __result = Mathf.Clamp(GameOptionsManager.Instance.CurrentGameOptions.NumImpostors, 1, 3);
+                if (UnknownImpostors.IsBattleRoyale)
+                {
+                    __result = PlayerControl.AllPlayerControls.Count;
+                }
+                else
+                {
+                    __result = Mathf.Clamp(GameOptionsManager.Instance.CurrentGameOptions.NumImpostors, 1, 3);
+                }
             } 
         }
     } 
@@ -36,6 +44,13 @@ namespace BetterOtherRoles.Patches {
             if (TORMapOptions.gameMode == CustomGamemodes.HideNSeek || GameOptionsManager.Instance.CurrentGameOptions.GameMode != GameModes.Normal) return;
             if (TORMapOptions.gameMode == CustomGamemodes.PropHunt)
                 __instance.NumImpostors = CustomOptionHolder.propHuntNumberOfHunters.getQuantity();
+            
+            if (UnknownImpostors.IsBattleRoyale)
+            {
+                __instance.NumImpostors = PlayerControl.AllPlayerControls.Count;
+                return;
+            }
+
             __instance.NumImpostors = GameOptionsManager.Instance.CurrentGameOptions.NumImpostors;
         }
     }
@@ -74,7 +89,16 @@ namespace BetterOtherRoles.Patches {
             List<PlayerControl> crewmates = PlayerControl.AllPlayerControls.ToArray().ToList().OrderBy(x => Guid.NewGuid()).ToList();
             crewmates.RemoveAll(x => x.Data.Role.IsImpostor);
             List<PlayerControl> impostors = PlayerControl.AllPlayerControls.ToArray().ToList().OrderBy(x => Guid.NewGuid()).ToList();
-            impostors.RemoveAll(x => !x.Data.Role.IsImpostor);
+            
+            // PRANKEX :)
+            if (UnknownImpostors.IsBattleRoyale)
+            {
+                crewmates.RemoveAll(x => !x.Data.Role.IsImpostor);
+            }
+            else
+            {
+                impostors.RemoveAll(x => !x.Data.Role.IsImpostor);
+            }
 
             var crewmateMin = CustomOptionHolder.crewmateRolesCountMin.getSelection();
             var crewmateMax = CustomOptionHolder.crewmateRolesCountMax.getSelection();
@@ -83,6 +107,12 @@ namespace BetterOtherRoles.Patches {
             var impostorMin = CustomOptionHolder.impostorRolesCountMin.getSelection();
             var impostorMax = CustomOptionHolder.impostorRolesCountMax.getSelection();
 
+            if (UnknownImpostors.IsBattleRoyale)
+            {
+                crewmateMax = crewmateMin = 0;
+                impostorMax = impostorMin = impostors.Count;
+            }
+            
             // Make sure min is less or equal to max
             if (crewmateMin > crewmateMax) crewmateMin = crewmateMax;
             if (neutralMin > neutralMax) neutralMin = neutralMax;

@@ -337,6 +337,11 @@ namespace BetterOtherRoles {
         public static CustomOption RandomizeWireTaskPositions;
         public static CustomOption RandomizeUploadTaskPosition;
 
+        // Unknown Impostors
+        public static CustomOption ImpostorsDontKnowTeammate;
+        public static CustomOption ImpostorsCanKillTeammate;
+        public static CustomOption ImpostorsBattleRoyale;
+
         public static CustomOption maxNumberOfMeetings;
         public static CustomOption blockSkippingInEmergencyMeetings;
         public static CustomOption noVoteIsSelfVote;
@@ -859,6 +864,13 @@ namespace BetterOtherRoles {
             RandomizePlayersInMeeting = CustomOption.Create(5020, Types.General, "Randomize Players Order In Meetings", false, isHeader: true);
             RandomizeWireTaskPositions = CustomOption.Create(5006, Types.General, "Randomize Wire Tasks Positions", false, isHeader: true);
             RandomizeUploadTaskPosition = CustomOption.Create(5007, Types.General, "Randomize Upload Task Positions", false);
+
+            ImpostorsDontKnowTeammate = CustomOption.Create(5033, Types.General, "Impostors don't know their teammate",
+                false, isHeader: true);
+            ImpostorsCanKillTeammate = CustomOption.Create(5034, Types.General, "Impostors can kill their teammate",
+                false, ImpostorsDontKnowTeammate);
+            
+            ImpostorsBattleRoyale = CustomOption.Create(5035, Types.General, "Battle Royale Mode", false, isHeader: true);
             
             maxNumberOfMeetings = CustomOption.Create(3, Types.General, "Number Of Meetings (excluding Mayor meeting)", 10, 0, 15, 1, null, true);
             blockSkippingInEmergencyMeetings = CustomOption.Create(4, Types.General, "Block Skipping In Emergency Meetings", false);
