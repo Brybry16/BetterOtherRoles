@@ -34,6 +34,7 @@ namespace BetterOtherRoles {
 
         public static CustomOption anyPlayerCanStopStart;
         public static CustomOption enableEventMode;
+        public static CustomOption deadImpsBlockSabotage;
 
         public static CustomOption mafiaSpawnRate;
         public static CustomOption janitorCooldown;
@@ -76,11 +77,13 @@ namespace BetterOtherRoles {
         public static CustomOption jackalSpawnRate;
         public static CustomOption jackalKillCooldown;
         public static CustomOption jackalCreateSidekickCooldown;
+        public static CustomOption jackalCanSabotageLights;
         public static CustomOption jackalCanUseVents;
         public static CustomOption jackalCanCreateSidekick;
         public static CustomOption sidekickPromotesToJackal;
         public static CustomOption sidekickCanKill;
         public static CustomOption sidekickCanUseVents;
+        public static CustomOption sidekickCanSabotageLights;
         public static CustomOption jackalPromotedFromSidekickCanCreateSidekick;
         public static CustomOption jackalCanCreateSidekickFromImpostor;
         public static CustomOption jackalAndSidekickHaveImpostorVision;
@@ -189,6 +192,7 @@ namespace BetterOtherRoles {
         public static CustomOption trackerCanTrackCorpses;
         public static CustomOption trackerCorpsesTrackingCooldown;
         public static CustomOption trackerCorpsesTrackingDuration;
+        public static CustomOption trackerTrackingMethod;
 
         public static CustomOption snitchSpawnRate;
         public static CustomOption snitchLeftTasksForReveal;
@@ -270,6 +274,14 @@ namespace BetterOtherRoles {
         public static CustomOption bomberDefuseDuration;
         public static CustomOption bomberBombCooldown;
         public static CustomOption bomberBombActiveAfter;
+
+        public static CustomOption yoyoSpawnRate;
+        public static CustomOption yoyoBlinkDuration;
+        public static CustomOption yoyoMarkCooldown;
+        public static CustomOption yoyoMarkStaysOverMeeting;
+        public static CustomOption yoyoHasAdminTable;
+        public static CustomOption yoyoAdminTableCooldown;
+        public static CustomOption yoyoSilhouetteVisibility;
         
         public static CustomOption UndertakerSpawnRate;
         public static CustomOption UndertakerSpeedModifier;
@@ -548,6 +560,14 @@ namespace BetterOtherRoles {
             bomberBombCooldown = CustomOption.Create(465, Types.Impostor, "Bomb Cooldown", 15f, 2.5f, 30f, 2.5f, bomberSpawnRate, suffix: "s");
             bomberBombActiveAfter = CustomOption.Create(466, Types.Impostor, "Bomb Is Active After", 3f, 0.5f, 15f, 0.5f, bomberSpawnRate, suffix: "s");
             
+            yoyoSpawnRate = CustomOption.Create(470, Types.Impostor, cs(Yoyo.color, "Yo-Yo"), rates, null, true);
+            yoyoBlinkDuration = CustomOption.Create(471, Types.Impostor, "Blink Duration", 20f, 2.5f, 120f, 2.5f, yoyoSpawnRate);
+            yoyoMarkCooldown = CustomOption.Create(472, Types.Impostor, "Mark Location Cooldown", 20f, 2.5f, 120f, 2.5f, yoyoSpawnRate);
+            yoyoMarkStaysOverMeeting = CustomOption.Create(473, Types.Impostor, "Marked Location Stays After Meeting", true, yoyoSpawnRate);
+            yoyoHasAdminTable = CustomOption.Create(474, Types.Impostor, "Has Admin Table", true, yoyoSpawnRate);
+            yoyoAdminTableCooldown = CustomOption.Create(475, Types.Impostor, "Admin Table Cooldown", 20f, 2.5f, 120f, 2.5f, yoyoHasAdminTable);
+            yoyoSilhouetteVisibility = CustomOption.Create(476, Types.Impostor, "Silhouette Visibility", new string[] { "0%", "10%", "20%", "30%", "40%", "50%" }, yoyoSpawnRate);
+            
             UndertakerSpawnRate = CustomOption.Create(5009, Types.Impostor, cs(Undertaker.Color, "Undertaker"), rates, null, true);
             UndertakerSpeedModifier = CustomOption.Create(5010, Types.Impostor,
                 "Speed modifier while dragging", 0f, -100f, 100f, 5f, UndertakerSpawnRate, suffix: "%");
@@ -587,10 +607,12 @@ namespace BetterOtherRoles {
             jackalKillCooldown = CustomOption.Create(221, Types.Neutral, "Jackal/Sidekick Kill Cooldown", 30f, 10f, 60f, 2.5f, jackalSpawnRate, suffix: "s");
             jackalCreateSidekickCooldown = CustomOption.Create(222, Types.Neutral, "Jackal Create Sidekick Cooldown", 30f, 10f, 60f, 2.5f, jackalSpawnRate);
             jackalCanUseVents = CustomOption.Create(223, Types.Neutral, "Jackal Can Use Vents", true, jackalSpawnRate);
+            jackalCanSabotageLights = CustomOption.Create(431, Types.Neutral, "Jackal Can Sabotage Lights", true, jackalSpawnRate);
             jackalCanCreateSidekick = CustomOption.Create(224, Types.Neutral, "Jackal Can Create A Sidekick", false, jackalSpawnRate);
             sidekickPromotesToJackal = CustomOption.Create(225, Types.Neutral, "Sidekick Gets Promoted To Jackal On Jackal Death", false, jackalCanCreateSidekick);
             sidekickCanKill = CustomOption.Create(226, Types.Neutral, "Sidekick Can Kill", false, jackalCanCreateSidekick);
             sidekickCanUseVents = CustomOption.Create(227, Types.Neutral, "Sidekick Can Use Vents", true, jackalCanCreateSidekick);
+            sidekickCanSabotageLights = CustomOption.Create(432, Types.Neutral, "Sidekick Can Sabotage Lights", true, jackalCanCreateSidekick);
             jackalPromotedFromSidekickCanCreateSidekick = CustomOption.Create(228, Types.Neutral, "Jackals Promoted From Sidekick Can Create A Sidekick", true, sidekickPromotesToJackal);
             jackalCanCreateSidekickFromImpostor = CustomOption.Create(229, Types.Neutral, "Jackals Can Make An Impostor To His Sidekick", true, jackalCanCreateSidekick);
             jackalAndSidekickHaveImpostorVision = CustomOption.Create(430, Types.Neutral, "Jackal And Sidekick Have Impostor Vision", false, jackalSpawnRate);
@@ -683,6 +705,7 @@ namespace BetterOtherRoles {
             trackerCanTrackCorpses = CustomOption.Create(203, Types.Crewmate, "Tracker Can Track Corpses", true, trackerSpawnRate);
             trackerCorpsesTrackingCooldown = CustomOption.Create(204, Types.Crewmate, "Corpses Tracking Cooldown", 30f, 5f, 120f, 5f, trackerCanTrackCorpses, suffix: "s");
             trackerCorpsesTrackingDuration = CustomOption.Create(205, Types.Crewmate, "Corpses Tracking Duration", 5f, 2.5f, 30f, 2.5f, trackerCanTrackCorpses, suffix: "s");
+            trackerTrackingMethod = CustomOption.Create(206, Types.Crewmate, "How Tracker Gets Target Location", new string[] { "Arrow Only", "Proximity Dectector Only", "Arrow + Proximity" }, trackerSpawnRate);
                            
             snitchSpawnRate = CustomOption.Create(210, Types.Crewmate, cs(Snitch.color, "Snitch"), rates, null, true);
             snitchLeftTasksForReveal = CustomOption.Create(219, Types.Crewmate, "Task Count Where The Snitch Will Be Revealed", 5f, 0f, 25f, 1f, snitchSpawnRate);
@@ -884,6 +907,7 @@ namespace BetterOtherRoles {
             finishTasksBeforeHauntingOrZoomingOut = CustomOption.Create(9, Types.General, "Finish Tasks Before Haunting Or Zooming Out", true, isHeader: true);
             camsNightVision = CustomOption.Create(11, Types.General, "Cams Switch To Night Vision If Lights Are Off", false, null, true);
             camsNoNightVisionIfImpVision = CustomOption.Create(12, Types.General, "Impostor Vision Ignores Night Vision Cams", false, camsNightVision, false);
+            deadImpsBlockSabotage = CustomOption.Create(13, Types.General, cs(Palette.ImpostorRed, "Block Dead Impostor From Sabotaging"), false, null, false);
 
 
             dynamicMap = CustomOption.Create(500, Types.General, "Play On A Random Map", false, null, true);

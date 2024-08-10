@@ -274,6 +274,9 @@ namespace BetterOtherRoles.Patches {
             if (p == 1f) foreach (Trap trap in Trap.traps) trap.triggerable = true;
             })));
 
+            if (!Yoyo.markStaysOverMeeting)
+                Silhouette.clearSilhouettes();
+            
             GameEvents.TriggerMeetingEnded(exiled != null
                 ? CachedPlayer.AllPlayers.Find(cp => cp.PlayerId == exiled.Object.PlayerId)
                 : null);

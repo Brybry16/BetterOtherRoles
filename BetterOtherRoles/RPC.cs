@@ -68,6 +68,7 @@ namespace BetterOtherRoles
         Fallen,
         Undertaker,
         StickyBomber,
+        Yoyo,
         Crewmate,
         Impostor,
         // Modifier ---
@@ -158,6 +159,8 @@ namespace BetterOtherRoles
         UndertakerDragBody,
         UndertakerDropBody,
         StickyBomberGiveBomb,
+        YoyoMarkLocation,
+        YoyoBlink,
 
         // Gamemode
         SetGuesserGm,
@@ -183,6 +186,7 @@ namespace BetterOtherRoles
             Garlic.clearGarlics();
             JackInTheBox.clearJackInTheBoxes();
             NinjaTrace.clearTraces();
+            Silhouette.clearSilhouettes();
             Portal.clearPortals();
             Bloodytrail.resetSprites();
             Trap.clearTraps();
@@ -396,6 +400,9 @@ namespace BetterOtherRoles
                         break;
                     case RoleId.StickyBomber:
                         StickyBomber.Player = player;
+                        break;
+                    case RoleId.Yoyo:
+                        Yoyo.yoyo = player;
                         break;
                     }
                     
@@ -759,6 +766,7 @@ namespace BetterOtherRoles
             if (player == Bomber.bomber) Bomber.clearAndReload();
             if (player == Undertaker.Player) Undertaker.ClearAndReload();
             if (player == StickyBomber.Player) StickyBomber.ClearAndReload();
+            if (player == Yoyo.yoyo) Yoyo.clearAndReload();
 
             // Other roles
             if (player == Jester.jester) Jester.clearAndReload();
@@ -1116,6 +1124,10 @@ namespace BetterOtherRoles
             }
             if (target == Ninja.ninja) Ninja.ninja = thief;
             if (target == Bomber.bomber) Bomber.bomber = thief;
+            if (target == Yoyo.yoyo) {
+                Yoyo.yoyo = thief;
+                Yoyo.markedLocation = null;
+            }
             if (target.Data.Role.IsImpostor) {
                 RoleManager.Instance.SetRole(Thief.thief, RoleTypes.Impostor);
                 FastDestroyableSingleton<HudManager>.Instance.KillButton.SetCoolDown(Thief.thief.killTimer, GameOptionsManager.Instance.currentNormalGameOptions.KillCooldown);
@@ -1308,6 +1320,40 @@ namespace BetterOtherRoles
         public static void shareRoom(byte playerId, byte roomId) {
             if (Snitch.playerRoomMap.ContainsKey(playerId)) Snitch.playerRoomMap[playerId] = roomId;
             else Snitch.playerRoomMap.Add(playerId, roomId);
+        }
+        
+        public static void yoyoMarkLocation(byte[] buff) {
+            if (Yoyo.yoyo == null) return;
+            Vector3 position = Vector3.zero;
+            position.x = BitConverter.ToSingle(buff, 0 * sizeof(float));
+            position.y = BitConverter.ToSingle(buff, 1 * sizeof(float));
+            Yoyo.markLocation(position);
+            new Silhouette(position, -1, false);
+        }
+
+        public static void yoyoBlink(bool isFirstJump, byte[] buff) {
+            BetterOtherRolesPlugin.Logger.LogMessage($"blink fistjumpo: {isFirstJump}");
+            if (Yoyo.yoyo == null || Yoyo.markedLocation == null) return;
+            var markedPos = (Vector3)Yoyo.markedLocation;
+            Yoyo.yoyo.NetTransform.SnapTo(markedPos);
+
+            var markedSilhouette = Silhouette.silhouettes.FirstOrDefault(s => s.gameObject.transform.position.x == markedPos.x && s.gameObject.transform.position.y == markedPos.y);
+            if (markedSilhouette != null)
+                markedSilhouette.permanent = false;
+
+            Vector3 position = Vector3.zero;
+            position.x = BitConverter.ToSingle(buff, 0 * sizeof(float));
+            position.y = BitConverter.ToSingle(buff, 1 * sizeof(float));
+            // Create Silhoutte At Start Position:
+            if (isFirstJump) {
+                Yoyo.markLocation(position);
+                new Silhouette(position, Yoyo.blinkDuration, true);
+            } else {
+                new Silhouette(position, 5, true);
+                Yoyo.markedLocation = null;
+            }
+            if (Chameleon.chameleon.Any(x => x.PlayerId == Yoyo.yoyo.PlayerId)) // Make the Yoyo visible if chameleon!
+                Chameleon.lastMoved[Yoyo.yoyo.PlayerId] = Time.time;            
         }
     }
 
@@ -1543,9 +1589,14 @@ namespace BetterOtherRoles
                     byte gm = reader.ReadByte();
                     RPCProcedure.shareGamemode(gm);
                     break;
-                
                 case (byte)CustomRPC.StopStart:
                     RPCProcedure.stopStart(reader.ReadByte());
+                    break;
+                case (byte)CustomRPC.YoyoMarkLocation:
+                    RPCProcedure.yoyoMarkLocation(reader.ReadBytesAndSize());
+                    break;
+                case (byte)CustomRPC.YoyoBlink:
+                    RPCProcedure.yoyoBlink(reader.ReadByte() == byte.MaxValue, reader.ReadBytesAndSize());
                     break;
 
                 // Game mode

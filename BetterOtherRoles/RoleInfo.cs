@@ -77,6 +77,7 @@ namespace BetterOtherRoles
             "A thief stole your role", RoleId.Fallen, true);
         public static RoleInfo undertaker = new RoleInfo("Undertaker", Undertaker.Color, "Drag bodies to hide them", "Drag bodies to hide them", RoleId.Undertaker);
         public static RoleInfo stickyBomber = new RoleInfo("Sticky Bomber", StickyBomber.Color, "Stick bomb to crewmates", "Stick bomb to crewmates", RoleId.StickyBomber);
+        public static RoleInfo yoyo = new RoleInfo("Yo-Yo", Yoyo.color, "Blink to a marked location and Back", "Blink to a location", RoleId.Yoyo);
         
         public static RoleInfo hunter = new RoleInfo("Hunter", Palette.ImpostorRed, Helpers.cs(Palette.ImpostorRed, "Seek and kill everyone"), "Seek and kill everyone", RoleId.Impostor);
         public static RoleInfo hunted = new RoleInfo("Hunted", Color.white, "Hide", "Hide", RoleId.Crewmate);
@@ -114,6 +115,7 @@ namespace BetterOtherRoles
             witch,
             ninja,
             bomber,
+            yoyo,
             goodGuesser,
             badGuesser,
             lover,
@@ -206,6 +208,7 @@ namespace BetterOtherRoles
             if (p == Witch.witch) infos.Add(witch);
             if (p == Ninja.ninja) infos.Add(ninja);
             if (p == Bomber.bomber) infos.Add(bomber);
+            if (p == Yoyo.yoyo) infos.Add(yoyo);
             if (p == Undertaker.Player) infos.Add(undertaker);
             if (p == StickyBomber.Player) infos.Add(stickyBomber);
             if (p == Detective.detective) infos.Add(detective);

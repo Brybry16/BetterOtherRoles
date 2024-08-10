@@ -62,6 +62,7 @@ namespace BetterOtherRoles
             Thief.clearAndReload();
             Trapper.clearAndReload();
             Bomber.clearAndReload();
+            Yoyo.clearAndReload();
             Fallen.ClearAndReload();
             Undertaker.ClearAndReload();
             StickyBomber.ClearAndReload();
@@ -88,9 +89,9 @@ namespace BetterOtherRoles
             public static PlayerControl jester;
             public static Color color = new Color32(236, 98, 165, byte.MaxValue);
 
-            public static bool triggerJesterWin = false;
+            public static bool triggerJesterWin;
             public static bool canCallEmergency = true;
-            public static bool hasImpostorVision = false;
+            public static bool hasImpostorVision;
 
             public static void clearAndReload() {
                 jester = null;
@@ -161,11 +162,11 @@ namespace BetterOtherRoles
         public static class Mayor {
             public static PlayerControl mayor;
             public static Color color = new Color32(32, 77, 66, byte.MaxValue);
-            public static Minigame emergency = null;
-            public static Sprite emergencySprite = null;
+            public static Minigame emergency;
+            public static Sprite emergencySprite;
             public static int remoteMeetingsLeft = 1;
 
-            public static bool canSeeVoteColors = false;
+            public static bool canSeeVoteColors;
             public static int tasksNeededToSeeVoteColors;
             public static bool meetingButton = true;
             public static int mayorChooseSingleVote;
@@ -258,8 +259,8 @@ namespace BetterOtherRoles
             public static Color color = new Color32(248, 205, 70, byte.MaxValue);
 
             public static float cooldown = 30f;
-            public static bool canKillNeutrals = false;
-            public static bool spyCanDieToSheriff = false;
+            public static bool canKillNeutrals;
+            public static bool spyCanDieToSheriff;
 
             public static PlayerControl currentTarget;
 
@@ -324,7 +325,7 @@ namespace BetterOtherRoles
                     playerId = CachedPlayer.LocalPlayer.PlayerId;
 
                 if (active && playerId == CachedPlayer.LocalPlayer.PlayerId) {
-                    MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.ShareGhostInfo, Hazel.SendOption.Reliable, -1);
+                    MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.ShareGhostInfo, SendOption.Reliable);
                     writer.Write(CachedPlayer.LocalPlayer.PlayerId);
                     writer.Write((byte)RPCProcedure.GhostInfoTypes.HandcuffNoticed);
                     AmongUsClient.Instance.FinishRpcImmediately(writer);
@@ -380,8 +381,8 @@ namespace BetterOtherRoles
 
             public static float footprintIntervall = 1f;
             public static float footprintDuration = 1f;
-            public static bool anonymousFootprints = false;
-            public static float reportNameDuration = 0f;
+            public static bool anonymousFootprints;
+            public static float reportNameDuration;
             public static float reportColorDuration = 20f;
             public static float timer = 6.2f;
 
@@ -406,8 +407,8 @@ namespace BetterOtherRoles
         public static float shieldDuration = 3f;
         public static float cooldown = 30f;
 
-        public static bool shieldActive = false;
-        public static bool isRewinding = false;
+        public static bool shieldActive;
+        public static bool isRewinding;
 
         private static Sprite buttonSprite;
         public static Sprite getButtonSprite() {
@@ -434,12 +435,12 @@ namespace BetterOtherRoles
         public static Color color = new Color32(126, 251, 194, byte.MaxValue);
         public static bool usedShield;
 
-        public static int showShielded = 0;
-        public static bool showAttemptToShielded = false;
-        public static bool showAttemptToMedic = false;
-        public static bool setShieldAfterMeeting = false;
-        public static bool showShieldAfterMeeting = false;
-        public static bool meetingAfterShielding = false;
+        public static int showShielded;
+        public static bool showAttemptToShielded;
+        public static bool showAttemptToMedic;
+        public static bool setShieldAfterMeeting;
+        public static bool showShieldAfterMeeting;
+        public static bool meetingAfterShielding;
 
         public static Color shieldedColor = new Color32(0, 221, 255, byte.MaxValue);
         public static PlayerControl currentTarget;
@@ -484,8 +485,8 @@ namespace BetterOtherRoles
         public static PlayerControl swapper;
         public static Color color = new Color32(134, 55, 86, byte.MaxValue);
         private static Sprite spriteCheck;
-        public static bool canCallEmergency = false;
-        public static bool canOnlySwapOthers = false;
+        public static bool canCallEmergency;
+        public static bool canOnlySwapOthers;
         public static int charges;
         public static float rechargeTasksNumber;
         public static float rechargedTasks;
@@ -519,7 +520,7 @@ namespace BetterOtherRoles
         public static bool bothDie = true;
         public static bool enableChat = true;
         // Lovers save if next to be exiled is a lover, because RPC of ending game comes before RPC of exiled
-        public static bool notAckedExiledIsLover = false;
+        public static bool notAckedExiledIsLover;
 
         public static bool existing() {
             return lover1 != null && lover2 != null && !lover1.Data.Disconnected && !lover2.Data.Disconnected;
@@ -570,11 +571,11 @@ namespace BetterOtherRoles
     public static class Seer {
         public static PlayerControl seer;
         public static Color color = new Color32(97, 178, 108, byte.MaxValue);
-        public static List<Vector3> deadBodyPositions = new List<Vector3>();
+        public static List<Vector3> deadBodyPositions = new();
 
         public static float soulDuration = 15f;
-        public static bool limitSoulDuration = false;
-        public static int mode = 0;
+        public static bool limitSoulDuration;
+        public static int mode;
 
         private static Sprite soulSprite;
         public static Sprite getSoulSprite() {
@@ -604,7 +605,7 @@ namespace BetterOtherRoles
         public static PlayerControl currentTarget;
         public static PlayerControl sampledTarget;
         public static PlayerControl morphTarget;
-        public static float morphTimer = 0f;
+        public static float morphTimer;
 
         public static void resetMorph() {
             morphTarget = null;
@@ -643,7 +644,7 @@ namespace BetterOtherRoles
     
         public static float cooldown = 30f;
         public static float duration = 10f;
-        public static float camouflageTimer = 0f;
+        public static float camouflageTimer;
 
         private static Sprite buttonSprite;
         public static Sprite getButtonSprite() {
@@ -672,15 +673,15 @@ namespace BetterOtherRoles
 
     public static class Hacker {
         public static PlayerControl hacker;
-        public static Minigame vitals = null;
-        public static Minigame doorLog = null;
+        public static Minigame vitals;
+        public static Minigame doorLog;
         public static Color color = new Color32(117, 250, 76, byte.MaxValue);
 
         public static float cooldown = 30f;
         public static float duration = 10f;
         public static float toolsNumber = 5f;
-        public static bool onlyColorType = false;
-        public static float hackerTimer = 0f;
+        public static bool onlyColorType;
+        public static float hackerTimer;
         public static int rechargeTasksNumber = 2;
         public static int rechargedTasks = 2;
         public static int chargesVitals = 1;
@@ -742,21 +743,25 @@ namespace BetterOtherRoles
     public static class Tracker {
         public static PlayerControl tracker;
         public static Color color = new Color32(100, 58, 220, byte.MaxValue);
-        public static List<Arrow> localArrows = new List<Arrow>();
+        public static List<Arrow> localArrows = new();
 
         public static float updateIntervall = 5f;
-        public static bool resetTargetAfterMeeting = false;
-        public static bool canTrackCorpses = false;
+        public static bool resetTargetAfterMeeting;
+        public static bool canTrackCorpses;
         public static float corpsesTrackingCooldown = 30f;
         public static float corpsesTrackingDuration = 5f;
-        public static float corpsesTrackingTimer = 0f;
-        public static List<Vector3> deadBodyPositions = new List<Vector3>();
+        public static float corpsesTrackingTimer;
+        public static int trackingMode;
+        public static List<Vector3> deadBodyPositions = new();
 
         public static PlayerControl currentTarget;
         public static PlayerControl tracked;
-        public static bool usedTracker = false;
-        public static float timeUntilUpdate = 0f;
-        public static Arrow arrow = new Arrow(Color.blue);
+        public static bool usedTracker;
+        public static float timeUntilUpdate;
+        public static Arrow arrow = new(Color.blue);
+
+        public static GameObject DangerMeterParent;
+        public static DangerMeter Meter;
 
         private static Sprite trackCorpsesButtonSprite;
         public static Sprite getTrackCorpsesButtonSprite()
@@ -797,6 +802,11 @@ namespace BetterOtherRoles
             corpsesTrackingCooldown = CustomOptionHolder.trackerCorpsesTrackingCooldown.getFloat();
             corpsesTrackingDuration = CustomOptionHolder.trackerCorpsesTrackingDuration.getFloat();
             canTrackCorpses = CustomOptionHolder.trackerCanTrackCorpses.getBool();
+            trackingMode = CustomOptionHolder.trackerTrackingMethod.getSelection();
+            if (DangerMeterParent) {
+                UnityEngine.Object.Destroy(Meter.gameObject);
+                UnityEngine.Object.Destroy(DangerMeterParent);
+            }
         }
     }
 
@@ -894,6 +904,7 @@ namespace BetterOtherRoles
         public static bool wasTeamRed;
         public static bool wasImpostor;
         public static bool wasSpy;
+        public static bool canSabotageLights;
 
         public static Sprite getSidekickButtonSprite() {
             if (buttonSprite) return buttonSprite;
@@ -923,6 +934,7 @@ namespace BetterOtherRoles
             formerJackals.Clear();
             hasImpostorVision = CustomOptionHolder.jackalAndSidekickHaveImpostorVision.getBool();
             wasTeamRed = wasImpostor = wasSpy = false;
+            canSabotageLights = CustomOptionHolder.jackalCanSabotageLights.getBool();
         }
         
     }
@@ -942,6 +954,7 @@ namespace BetterOtherRoles
         public static bool canKill = true;
         public static bool promotesToJackal = true;
         public static bool hasImpostorVision = false;
+        public static bool canSabotageLights;
 
         public static void clearAndReload() {
             sidekick = null;
@@ -952,6 +965,7 @@ namespace BetterOtherRoles
             promotesToJackal = CustomOptionHolder.sidekickPromotesToJackal.getBool();
             hasImpostorVision = CustomOptionHolder.jackalAndSidekickHaveImpostorVision.getBool();
             wasTeamRed = wasImpostor = wasSpy = false;
+            canSabotageLights = CustomOptionHolder.sidekickCanSabotageLights.getBool();
         }
     }
 
@@ -1800,6 +1814,52 @@ namespace BetterOtherRoles
         }
     }
 
+    public static class Yoyo {
+        public static PlayerControl yoyo = null;
+        public static Color color = Palette.ImpostorRed;
+
+        public static float blinkDuration = 0;
+        public static float markCooldown = 0;
+        public static bool markStaysOverMeeting = false;
+        public static bool hasAdminTable = false;
+        public static float adminCooldown = 0;
+        public static float SilhouetteVisibility => (silhouetteVisibility == 0 && (PlayerControl.LocalPlayer == yoyo || PlayerControl.LocalPlayer.Data.IsDead)) ? 0.1f : silhouetteVisibility;
+        public static float silhouetteVisibility = 0;
+
+        public static Vector3? markedLocation = null;
+
+        private static Sprite markButtonSprite;
+
+        public static Sprite getMarkButtonSprite() {
+            if (markButtonSprite) return markButtonSprite;
+            markButtonSprite = Helpers.loadSpriteFromResources("BetterOtherRoles.Resources.YoyoMarkButtonSprite.png", 115f);
+            return markButtonSprite;
+        }
+        private static Sprite blinkButtonSprite;
+
+        public static Sprite getBlinkButtonSprite() {
+            if (blinkButtonSprite) return blinkButtonSprite;
+            blinkButtonSprite = Helpers.loadSpriteFromResources("BetterOtherRoles.Resources.YoyoBlinkButtonSprite.png", 115f);
+            return blinkButtonSprite;
+        }
+
+        public static void markLocation(Vector3 position) {
+            markedLocation = position;
+        }
+
+        public static void clearAndReload() {
+            blinkDuration = CustomOptionHolder.yoyoBlinkDuration.getFloat();
+            markCooldown = CustomOptionHolder.yoyoMarkCooldown.getFloat();
+            markStaysOverMeeting = CustomOptionHolder.yoyoMarkStaysOverMeeting.getBool();
+            hasAdminTable = CustomOptionHolder.yoyoHasAdminTable.getBool();
+            adminCooldown = CustomOptionHolder.yoyoAdminTableCooldown.getFloat();
+            silhouetteVisibility = CustomOptionHolder.yoyoSilhouetteVisibility.getSelection() / 10f;
+
+            markedLocation = null;
+
+        }
+    }
+    
     public static class Fallen
     {
         public static PlayerControl Player;

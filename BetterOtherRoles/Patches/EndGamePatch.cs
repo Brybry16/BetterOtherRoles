@@ -10,6 +10,8 @@ using BetterOtherRoles.Players;
 using BetterOtherRoles.Utilities;
 using BetterOtherRoles.CustomGameModes;
 using BetterOtherRoles.Modules;
+using Rewired.Data.Mapping;
+using Unity.Services.Core.Scheduler.Internal;
 
 namespace BetterOtherRoles.Patches {
     enum CustomGameOverReason {
@@ -401,7 +403,6 @@ namespace BetterOtherRoles.Patches {
                 roleSummaryTextMesh.text = roleSummaryText.ToString();
             }
             AdditionalTempData.clear();
-            GameEvents.TriggerEndGame();
         }
     }
 

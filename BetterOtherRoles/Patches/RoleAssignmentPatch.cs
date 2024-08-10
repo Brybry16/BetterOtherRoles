@@ -152,6 +152,7 @@ namespace BetterOtherRoles.Patches {
             impSettings.Add((byte)RoleId.Bomber, CustomOptionHolder.bomberSpawnRate.getSelection());
             impSettings.Add((byte)RoleId.Undertaker, CustomOptionHolder.UndertakerSpawnRate.getSelection());
             impSettings.Add((byte)RoleId.StickyBomber, CustomOptionHolder.StickyBomberSpawnRate.getSelection());
+            impSettings.Add((byte)RoleId.Yoyo, CustomOptionHolder.yoyoSpawnRate.getSelection());
 
             neutralSettings.Add((byte)RoleId.Jester, CustomOptionHolder.jesterSpawnRate.getSelection());
             neutralSettings.Add((byte)RoleId.Arsonist, CustomOptionHolder.arsonistSpawnRate.getSelection());

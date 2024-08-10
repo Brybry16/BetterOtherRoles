@@ -1,10 +1,35 @@
-﻿using BetterOtherRoles.Players;
+﻿using System;
+using System.Runtime.CompilerServices;
+using BetterOtherRoles.Players;
+using HarmonyLib;
+using Hazel;
+using InnerNet;
 using JetBrains.Annotations;
 
 namespace BetterOtherRoles.Modules;
 
 public static class GameEvents
 {
+    
+
+    [HarmonyPatch(typeof(InnerNetClient), nameof(InnerNetClient.HandleMessage))]
+    public static class InnerNetClientHandleMessagePatch
+    {
+        [HarmonyPrefix]
+        public static void Prefix([HarmonyArgument(0)] MessageReader reader)
+        {
+            // Right before running CoStartGame Coroutine
+            if (reader.Tag == 2)
+            {
+                TriggerGameStarting();
+            }
+        }
+    }
+    
+    public static event GameStartingHandler? OnGameStarting;
+    public delegate void GameStartingHandler();
+    public static void TriggerGameStarting() => OnGameStarting?.Invoke();
+    
     public static event GameStartedHandler? OnGameStarted;
 
     public delegate void GameStartedHandler();
@@ -19,6 +44,9 @@ public static class GameEvents
     public static void TriggerTaskCompleted(PlayerControl player, PlayerTask task) =>
         OnTaskCompleted?.Invoke(player, task);
 
+    public static event ExitToMainMenuHandler? OnExitToMainMenu;
+    public delegate void ExitToMainMenuHandler();
+    public static void TriggerExitToMainMenu() => OnExitToMainMenu?.Invoke();
     
     public static event PlayerLeftHandler? OnPlayerLeft;
 
@@ -33,6 +61,11 @@ public static class GameEvents
 
     public static void TriggerEndGame() => OnGameEnded?.Invoke();
 
+
+    public static event PlayAgainHandler? OnPlayAgain;
+    public delegate void PlayAgainHandler();
+    public static void TriggerPlayAgain() => OnPlayAgain?.Invoke();
+    
     public static event MeetingStarted? OnMeetingStarted;
 
     public delegate void MeetingStarted();

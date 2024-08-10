@@ -25,10 +25,29 @@ namespace BetterOtherRoles.Modules {
         }
 
         [HarmonyPatch(typeof(ChatBubble), nameof(ChatBubble.SetName))]
-        public static class SetBubbleName { 
-            public static void Postfix(ChatBubble __instance, [HarmonyArgument(0)] string playerName) {
-                PlayerControl sourcePlayer = PlayerControl.AllPlayerControls.ToArray().ToList().FirstOrDefault(x => x.Data != null && x.Data.PlayerName.Equals(playerName));
-                if (CachedPlayer.LocalPlayer != null && CachedPlayer.LocalPlayer.Data.Role.IsImpostor && (Spy.spy != null && sourcePlayer.PlayerId == Spy.spy.PlayerId || Sidekick.sidekick != null && Sidekick.wasTeamRed && sourcePlayer.PlayerId == Sidekick.sidekick.PlayerId || Jackal.jackal != null && Jackal.wasTeamRed && sourcePlayer.PlayerId == Jackal.jackal.PlayerId) && __instance != null) __instance.NameText.color = Palette.ImpostorRed;
+        public static class SetBubbleName {
+            public static void Postfix(ChatBubble __instance, [HarmonyArgument(0)] string playerName)
+            {
+                PlayerControl sourcePlayer = PlayerControl.AllPlayerControls.ToArray().ToList()
+                    .FirstOrDefault(x => x.Data != null && x.Data.PlayerName.Equals(playerName));
+                if (CachedPlayer.LocalPlayer != null && CachedPlayer.LocalPlayer.Data.Role.IsImpostor)
+                {
+                    if (UnknownImpostors.IsEnabled && sourcePlayer.PlayerId != CachedPlayer.LocalPlayer.PlayerId && sourcePlayer.Data.Role.IsImpostor)
+                    {
+                        __instance.NameText.color = Palette.White;
+                        return;
+                    }
+
+                    if ((Spy.spy != null && sourcePlayer.PlayerId == Spy.spy.PlayerId ||
+                         Sidekick.sidekick != null && Sidekick.wasTeamRed &&
+                         sourcePlayer.PlayerId == Sidekick.sidekick.PlayerId ||
+                         Jackal.jackal != null && Jackal.wasTeamRed &&
+                         sourcePlayer.PlayerId == Jackal.jackal.PlayerId) &&
+                        __instance != null)
+                    {
+                        __instance.NameText.color = Palette.ImpostorRed;
+                    }
+                }
             }
         }
 

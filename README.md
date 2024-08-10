@@ -28,10 +28,10 @@ Even more roles are coming soon. :)
 | [Witch](#witch)                 | [Tracker](#tracker) |  |  |
 | [Ninja](#ninja)                 | [Snitch](#snitch) |  |  |
 | [Bomber](#bomber)               | [Spy](#spy) |  |  |
-| [Evil Guesser](#guesser)        | [Portalmaker](#portalmaker) |  |  |
+| [Yo-Yo](#yoyo)                  | [Portalmaker](#portalmaker) |  |  |
 | [Undertaker](#undertaker)       | [Security Guard](#security-guard) |  |  |
 | [Sticky Bomber](#sticky-bomber) | [Medium](#medium) |  |  |
-|                                 | [Trapper](#trapper) |  |  |
+| [Evil Guesser](#guesser)        | [Trapper](#trapper) |  |  |
 |                                 | [Nice Guesser](#guesser) |  |  |
 
 The [Role Assignment](#role-assignment) sections explains how the roles are being distributed among the players.
@@ -49,8 +49,19 @@ The [Role Assignment](#role-assignment) sections explains how the roles are bein
 
 **Version 1.6.x**
 - Updated to Among Us version 2024.3.5
-- Updated up to The Other Roles 4.5.2
+- Updated up to The Other Roles 4.5.3
+- Mod generates the dependency lib file if not found
+- Added an option to disable the "Clean Vent" task (since it's bugged in Among Us v2024.3.5)
+- Added Random Scanner Position for The Skeld, MiraHQ and Submerged
+- Added more possible values for Crewmate Vision (0.125 increment instead of 0.25)
+- Added an option to make so Impostors don't know eachother
+- Added new Battle Royale mode
+- Added support for beta releases/pre-releases
+- Dead players can now see player names when Mushroom Mixup Sabotage is active
 - Fixed Impostor not seeing names when Mushroom Mixup Sabotage is active
+- Fixed Sticky Bomb not exploding when using transportation
+- Fixed Sticky Bomb not exploding on meeting start when holder is using a transportation
+- Fixed Swapper being unable to complete TuneRadio Task in Fungle
 
 **Version 1.5.x**
 - Updated to Among Us version 2023.10.24
@@ -512,6 +523,31 @@ Crewmates can defuse a bomb depending on the settings.
 | Bomb Is Active After |
 -----------------------
 
+## YoYo
+### **Team: Impostors**
+The Yo-Yo is an Impostor who has the ability mark a position and later blink (teleport) to this position.\
+After the initial blink, the Yo-Yo has a fixed amount of time (option) to do whatever they want, before automatically blinking back to the starting point of the first blink.\
+Each blink leaves behind a silhouette with configurable transparency. The silhouette is very hard to see.\
+The Yo-Yo may also have access to a mobile admin table, depending on the settings.
+
+**NOTE:**
+
+- The marked position for the first jump's target is displayed to the Yo-Yo and ghosts only.
+- The silhouette of the first blink stays (almost) until the Yo-Yo returns
+- The silhouette of the second blink (return) stays for 5 seconds
+
+### Game Options
+| Name | Description |
+|----------|:-------------:|
+| Yo-Yo Spawn Chance | -
+| Blink Duration | -
+| Mark Location Cooldown | -
+| Marked Location Stays After Meeting | -
+| Has Admin Table | -
+| Admin Table Cooldown | -
+| Silhouette Visibility | -
+-----------------------
+
 ## Undertaker
 ### **Team: Impostors**
 The Undertaker is an impostor who has the ability to drag a corpse to move it.
@@ -649,7 +685,12 @@ If both Impostors and Jackals are in the game, the game continues even if all Cr
 | Jackal/Sidekick Kill Cooldown | Kill cooldown |
 | Jackal Create Sidekick Cooldown | Cooldown before a Sidekick can be created |
 | Jackal can use vents | Yes/No |
+| Jackal can sabotage Lights | Yes/No |
 | Jackal can create a Sidekick | Yes/No |
+| Sidekick gets promoted to Jackal on Jackal Death | Yes/No |
+| Sidekick can kill | Yes/No |
+| Sidekick can Vent | Yes/No |
+| Jackal can sabotage Lights | Yes/No |
 | Jackals promoted from Sidekick can create a Sidekick | Yes/No (to prevent the Jackal team from growing) |
 | Jackals can make an Impostor to their Sidekick | Yes/No (to prevent a Jackal from turning an Impostor into a Sidekick, if they use the ability on an Impostor they see the Impostor as Sidekick, but the Impostor isn't converted to Sidekick. If this option is set to "No" Jackal and Sidekick can kill each other.) |
 | Jackal and Sidekick have Impostor vision | - |
@@ -1028,6 +1069,7 @@ Depending on the options, the Tracker has another ability: They can track all co
 | Tracker Can Track Corpses | -
 | Corpses Tracking Cooldown | -
 | Corpses Tracking Duration | -
+| How Tracker Gets Target Location| -
 -----------------------
 
 ## Snitch

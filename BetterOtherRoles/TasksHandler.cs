@@ -40,8 +40,8 @@ namespace BetterOtherRoles {
                 playerInfo.Role)
             {
                 TotalTasks = playerInfo.Tasks.Count;
-                // 1 task par joueur toutes les 28 secondes environ (la moyenne est de 23.63 secondes par task)
-                CompletedTasks += Mathf.Clamp((int) Math.Floor(UnknownImpostors.getElapsedTime().TotalSeconds/28.0), 0, TotalTasks);
+                // 1 task par joueur toutes les 23 secondes environ (la moyenne est de 23.63 secondes par task)
+                CompletedTasks += Mathf.Clamp((int) Math.Floor(UnknownImpostors.getElapsedTime().TotalSeconds/23.0), 0, TotalTasks);
             }
 
             return Tuple.Create(CompletedTasks, TotalTasks);

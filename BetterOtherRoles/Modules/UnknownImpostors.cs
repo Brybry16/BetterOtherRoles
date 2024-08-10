@@ -1,7 +1,9 @@
 ﻿using BetterOtherRoles.Players;
 using BetterOtherRoles.Utilities.Attributes;
+using HarmonyLib;
 using Il2CppSystem;
 using Il2CppSystem.Diagnostics;
+using UnityEngine;
 
 namespace BetterOtherRoles.Modules;
 
