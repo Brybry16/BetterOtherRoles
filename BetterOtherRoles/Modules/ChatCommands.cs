@@ -30,7 +30,7 @@ namespace BetterOtherRoles.Modules {
             {
                 PlayerControl sourcePlayer = PlayerControl.AllPlayerControls.ToArray().ToList()
                     .FirstOrDefault(x => x.Data != null && x.Data.PlayerName.Equals(playerName));
-                if (CachedPlayer.LocalPlayer != null && CachedPlayer.LocalPlayer.Data.Role.IsImpostor)
+                if (sourcePlayer != null && CachedPlayer.LocalPlayer != null && CachedPlayer.LocalPlayer.Data.Role.IsImpostor)
                 {
                     if (UnknownImpostors.IsEnabled && sourcePlayer.PlayerId != CachedPlayer.LocalPlayer.PlayerId && sourcePlayer.Data.Role.IsImpostor)
                     {

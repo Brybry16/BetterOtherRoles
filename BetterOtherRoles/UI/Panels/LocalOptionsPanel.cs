@@ -24,7 +24,7 @@ public class LocalOptionsPanel : WrappedPanel
     public override bool DisplayTitleBar => true;
     public override Color BackgroundColor => UIPalette.Dark;
     public override bool AlwaysOnTop => true;
-    public override Positions Position => Positions.TopLeft;
+    public override Positions Position => Positions.TopRight;
     
     private Text _categoryTitle = null!;
 
@@ -97,6 +97,12 @@ public class LocalOptionsPanel : WrappedPanel
         showVentsOnMap.OnUpdated += value =>
         {
             TORMapOptions.showVentsOnMap = value;
+        };
+        
+        var showChatNotifications = new LocalOptionEditor("Show Chat Notifications", this, content, BetterOtherRolesPlugin.ShowChatNotifications);
+        showChatNotifications.OnUpdated += value =>
+        {
+            TORMapOptions.showChatNotifications = value;
         };
         
         var getBetaReleases = new LocalOptionEditor("Get Beta Releases", this, content, BetterOtherRolesPlugin.GetBetaReleases);

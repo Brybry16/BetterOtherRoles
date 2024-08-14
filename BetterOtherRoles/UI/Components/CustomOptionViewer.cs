@@ -52,7 +52,7 @@ public class CustomOptionViewer
         
         Options.Add(this);
         SetActive(IsParentActive);
-        _option.OnChange += UpdateValue;
+        _option.onChange += UpdateValue;
     }
 
     private void UpdateValue()

@@ -9,7 +9,7 @@ namespace BetterOtherRoles {
     [HarmonyPatch]
     public static class TasksHandler {
 
-        public static Tuple<int, int> taskInfo(GameData.PlayerInfo playerInfo) {
+        public static Tuple<int, int> taskInfo(NetworkedPlayerInfo playerInfo) {
             int TotalTasks = 0;
             int CompletedTasks = 0;
             if (!playerInfo.Disconnected && playerInfo.Tasks != null &&
@@ -26,7 +26,7 @@ namespace BetterOtherRoles {
             return Tuple.Create(CompletedTasks, TotalTasks);
         }
 
-        public static Tuple<int, int> prankexTaskInfo(GameData.PlayerInfo playerInfo, int PlayersLeft)
+        public static Tuple<int, int> prankexTaskInfo(NetworkedPlayerInfo playerInfo, int PlayersLeft)
         {
             if (!UnknownImpostors.IsBattleRoyale || PlayersLeft <= 0)
             {

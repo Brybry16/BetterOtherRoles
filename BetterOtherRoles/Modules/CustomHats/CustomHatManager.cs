@@ -14,8 +14,9 @@ public static class CustomHatManager
     public const string ResourcesDirectory = "BetterOtherRolesResources";
     public const string InnerslothPackageName = "Innersloth Hats";
     public const string DeveloperPackageName = "Developer Hats";
+    public const string EterzxPackageName = "Eterzx Hats";
     
-    internal static readonly Tuple<string, string> Repository = new("EnoPM", "BetterOtherHats");
+    internal static readonly Tuple<string, string> Repository = new("Brybry16", "TheOtherHats");
     internal static string RepositoryUrl
     {
         get

@@ -10,10 +10,12 @@ namespace BetterOtherRoles.Modules;
 public static class DevConfig
 {
     private static ConfigEntry<string> DingusModeKey { get; set; }
+    private static ConfigEntry<string> EterzxModeKey { get; set; }
     public static bool DisableEndGameConditions { get; set; }
     public static bool DisablePlayerRequirementToLaunch { get; set; }
     public static Guid CurrentGuid { get; set; }
     public static bool IsDingusRelease { get; set; }
+    public static bool IsEterzxRelease { get; set; }
 
     public static Dictionary<string, string> LocalFlags { get; set; }
     public static Dictionary<string, string> Flags { get; set; }
@@ -25,6 +27,13 @@ public static class DevConfig
         {
             IsDingusRelease = Encrypt(DingusModeKey.Value) == "310fa3717f2b746dc22bb95470ae458e2a07322ee8e631007b670fb34baa8913";
         }
+        
+        EterzxModeKey = BetterOtherRolesPlugin.Instance.Config.Bind("Special Edition Flags", "Eterzx", "Unknown", "Password to unlock Eterzx special hats");
+        if (EterzxModeKey.Value != string.Empty)
+        {
+            IsEterzxRelease = Encrypt(EterzxModeKey.Value) == "e65b7301fa14b742b9bb94431b43911cf30b432a67e56d4ca0b2fbdc58d637d5";
+        }
+        
 #if RELEASE
         DisableEndGameConditions = false;
         DisablePlayerRequirementToLaunch = false;

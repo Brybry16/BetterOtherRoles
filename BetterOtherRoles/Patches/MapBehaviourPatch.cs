@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using BetterOtherRoles.Modules;
 using BetterOtherRoles.Objects;
 using BetterOtherRoles.Players;
 using BetterOtherRoles.UI;
@@ -89,9 +88,9 @@ namespace BetterOtherRoles.Patches
 							v /= MapUtilities.CachedShipStatus.MapScale;
 							v.x *= Mathf.Sign(MapUtilities.CachedShipStatus.transform.localScale.x);
 							v.z = -2.1f;
-							if (herePoints.ContainsKey(player))
+							if (herePoints.TryGetValue(player, out var point))
 							{
-								herePoints[player].transform.localPosition = v;
+								point.transform.localPosition = v;
 								continue;
 							}
 
@@ -183,7 +182,7 @@ namespace BetterOtherRoles.Patches
 				MapIcon.name = $"vent {vent.Id} icon";
 				MapIcon.transform.localPosition = location;
 
-				if (task?.IsComplete == false && task.FindConsoles()[0].ConsoleId == vent.Id)
+				if (task?.IsComplete == false && task.FindConsoles()._items[0].ConsoleId == vent.Id)
 				{
 					MapIcon.transform.localScale *= 0.6f;
 				}

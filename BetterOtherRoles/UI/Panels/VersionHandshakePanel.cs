@@ -26,7 +26,7 @@ public class VersionHandshakePanel : WrappedPanel
     public override bool CanClickThroughPanel => true;
     public override Color BackgroundColor => UIPalette.Transparent;
     public override bool AlwaysOnTop => false;
-    public override Positions Position => Positions.MiddleRight;
+    public override Positions Position => Positions.MiddleLeft;
 
     private Text _content;
 

@@ -120,17 +120,12 @@ namespace BetterOtherRoles.CustomGameModes {
             return Helpers.loadSpriteFromResources($"BetterOtherRoles.Resources.IntroAnimation.intro_{index + 1000}.png", 150f, cache: false);
         }
         
-        public static void updateWhitelistedObjects() {
+        public static void updateWhitelistedObjects(bool debug = false) {
             string allNames = Helpers.readTextFromResources("BetterOtherRoles.Resources.Txt.props.txt");
-            bool debug = false;
             if (debug) {
                 allNames = Helpers.readTextFromFile(System.IO.Directory.GetCurrentDirectory() + "\\Props.txt");
             }
-            BetterOtherRolesPlugin.Logger.LogMessage($"after debug");
             whitelistedObjects = allNames.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries).ToList();
-            BetterOtherRolesPlugin.Logger.LogMessage($"after split");
-
-            BetterOtherRolesPlugin.Logger.LogMessage($"Last element: {whitelistedObjects.Last()}");
         }
 
         public static void propTargetAndTimerDisplayUpdate() {
@@ -172,6 +167,7 @@ namespace BetterOtherRoles.CustomGameModes {
             {
                 poolablesBackground = new GameObject("poolablesBackground");
                 poolablesBackground.AddComponent<SpriteRenderer>();
+                poolablesBackground.layer = LayerMask.NameToLayer("UI");
                 if (poolablesBackgroundSprite == null)
                     poolablesBackgroundSprite =
                         Helpers.loadSpriteFromResources("BetterOtherRoles.Resources.poolablesBackground.jpg", 200f);
@@ -210,11 +206,6 @@ namespace BetterOtherRoles.CustomGameModes {
                 {
                     // Display Prop
                     poolablePlayer.cosmetics.nameText.text = Helpers.cs(Palette.CrewmateBlue, pc.Data.PlayerName);
-                    ;
-                    if (isCurrentlyRevealed.ContainsKey(pc.PlayerId))
-                    {
-
-                    }
                 }
 
                 // update currently revealed:
@@ -223,6 +214,7 @@ namespace BetterOtherRoles.CustomGameModes {
                     if (!revealRenderer.ContainsKey(pc.PlayerId))
                     {
                         var go = new GameObject($"reveal_renderer_{pc.PlayerId}");
+                        go.layer = LayerMask.NameToLayer("UI");
                         go.AddComponent<SpriteRenderer>();
                         go.transform.SetParent(poolablePlayer.transform.parent, false);
                         go.SetActive(true);
@@ -285,6 +277,7 @@ namespace BetterOtherRoles.CustomGameModes {
         }
 
         public static void dangerMeterUpdate() {
+            if (!HudManager.Instance || !HudManager.Instance.DangerMeter) return;
             if (HudManager.Instance.DangerMeter.gameObject.active) {
                 float dist = 55f;
                 float dist2 = 15f;
@@ -385,7 +378,7 @@ namespace BetterOtherRoles.CustomGameModes {
                 Collider2D bestCollider = null;
                 float bestDist = 9999;
                 if (whitelistedObjects == null || whitelistedObjects.Count == 0 || verbose) {
-                    updateWhitelistedObjects();
+                    updateWhitelistedObjects(true);
                 }
                 foreach (Collider2D collider in Physics2D.OverlapCircleAll(origin.transform.position, radius)) {
                     if (verbose) {
@@ -549,7 +542,7 @@ namespace BetterOtherRoles.CustomGameModes {
 
         [HarmonyPatch(typeof(MapConsole), nameof(MapConsole.CanUse))]
         [HarmonyPostfix]
-        public static void AdminCanUsePostfix(MapConsole __instance, GameData.PlayerInfo pc, ref bool canUse, ref bool couldUse, ref float __result) {
+        public static void AdminCanUsePostfix(MapConsole __instance, NetworkedPlayerInfo pc, ref bool canUse, ref bool couldUse, ref float __result) {
             if (!PropHunt.isPropHuntGM || !PlayerControl.LocalPlayer.Data.Role.IsImpostor) return;
             if (canUse) {
                 if (HudManagerStartPatch.propHuntAdminButton.Timer > 0) {
@@ -592,7 +585,7 @@ namespace BetterOtherRoles.CustomGameModes {
         [HarmonyPrefix]
         public static bool CheckClickPatch(KillButton __instance) {
             if (!PropHunt.isPropHuntGM) return true;
-           __instance.DoClick();
+            __instance.DoClick();
             return false;
         }
 
@@ -602,6 +595,8 @@ namespace BetterOtherRoles.CustomGameModes {
         public static bool KillButtonClickPatch(KillButton __instance) {
             if (!PropHunt.isPropHuntGM || __instance.isCoolingDown || PlayerControl.LocalPlayer.Data.IsDead || PlayerControl.LocalPlayer.inVent) return false;
 
+            var targets = PlayerControl.LocalPlayer.Data.Role
+                .GetPlayersInAbilityRangeSorted(RoleBehaviour.GetTempPlayerList(), true).ToArray();
             __instance.SetTarget(PlayerControl.LocalPlayer.Data.Role.GetPlayersInAbilityRangeSorted(RoleBehaviour.GetTempPlayerList(), true).ToArray().FirstOrDefault());
 
             if (__instance.currentTarget == null) {
@@ -613,6 +608,16 @@ namespace BetterOtherRoles.CustomGameModes {
             }
             return false;
         }
+        
+        [HarmonyPatch(typeof(RoleBehaviour), nameof(RoleBehaviour.IsValidTarget))]
+        [HarmonyPrefix]
+        public static bool IsValidTargetPatch(RoleBehaviour __instance, NetworkedPlayerInfo target, ref bool __result) {
+            if (!PropHunt.isPropHuntGM) return true;
+            __result = !(target == null) && !target.Disconnected && !target.IsDead &&
+                       target.PlayerId != __instance.Player.PlayerId && !(target.Role == null) &&
+                       !(target.Object == null) && !target.Object.inVent && !target.Object.inMovingPlat;
+            return false;
+        }
 
         [HarmonyPatch(typeof(MapBehaviour), nameof(MapBehaviour.Show))]
         [HarmonyPrefix]
@@ -620,8 +625,7 @@ namespace BetterOtherRoles.CustomGameModes {
             if (!PropHunt.isPropHuntGM) return;
             if (opts.Mode == MapOptions.Modes.Sabotage) opts.Mode = MapOptions.Modes.Normal;
         }
-
-                
+        
         // Disable a lot of stuff
         [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.CmdReportDeadBody))]
         [HarmonyPatch(typeof(Vent), nameof(Vent.SetOutline))]

@@ -24,7 +24,7 @@ public class CustomOptionsPanel : WrappedPanel
     public override bool DisplayTitleBar => true;
     public override Color BackgroundColor => UIPalette.Dark;
     public override bool AlwaysOnTop => true;
-    public override Positions Position => Positions.TopLeft;
+    public override Positions Position => Positions.TopRight;
 
     private readonly Dictionary<int, GameObject> _categoryHolders = new();
 

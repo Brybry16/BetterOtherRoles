@@ -12,10 +12,10 @@ using BetterOtherRoles.CustomGameModes;
 using BetterOtherRoles.Modules;
 
 namespace BetterOtherRoles.Patches {
-    [HarmonyPatch(typeof(RoleOptionsCollectionV07), nameof(RoleOptionsCollectionV07.GetNumPerGame))]
+    [HarmonyPatch(typeof(RoleOptionsCollectionV08), nameof(RoleOptionsCollectionV08.GetNumPerGame))]
     class RoleOptionsDataGetNumPerGamePatch{
         public static void Postfix(ref int __result) {
-            if (CustomOptionHolder.activateRoles.getBool() && GameOptionsManager.Instance.CurrentGameOptions.GameMode == GameModes.Normal) __result = 0; // Deactivate Vanilla Roles if the mod roles are active
+            if (GameOptionsManager.Instance.CurrentGameOptions.GameMode == GameModes.Normal) __result = 0; // Deactivate Vanilla Roles if the mod roles are active
         }
     }
 
@@ -67,8 +67,8 @@ namespace BetterOtherRoles.Patches {
             AmongUsClient.Instance.FinishRpcImmediately(writer);
             RPCProcedure.resetVariables();
             if (TORMapOptions.gameMode == CustomGamemodes.HideNSeek || TORMapOptions.gameMode == CustomGamemodes.PropHunt || GameOptionsManager.Instance.currentGameOptions.GameMode == GameModes.HideNSeek) return; // Don't assign Roles in Hide N Seek
-            if (CustomOptionHolder.activateRoles.getBool()) // Don't assign Roles in Tutorial or if deactivated
-                assignRoles();
+            
+            assignRoles();
         }
 
         private static void assignRoles() {
@@ -81,7 +81,7 @@ namespace BetterOtherRoles.Patches {
             assignRoleTargets(data); // Assign targets for Lawyer & Prosecutor
             if (isGuesserGamemode) assignGuesserGamemode();
             assignModifiers(); // Assign modifier
-            setRolesAgain();
+            //setRolesAgain();
         }
 
         public static RoleAssignmentData getRoleAssignmentData() {
@@ -556,7 +556,7 @@ namespace BetterOtherRoles.Patches {
 
             playerRoleMap.Add(new Tuple<byte, byte>(playerId, roleId));
 
-            MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.SetRole, Hazel.SendOption.Reliable, -1);
+            MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.SetRole, Hazel.SendOption.Reliable, -1);
             writer.Write(roleId);
             writer.Write(playerId);
             AmongUsClient.Instance.FinishRpcImmediately(writer);

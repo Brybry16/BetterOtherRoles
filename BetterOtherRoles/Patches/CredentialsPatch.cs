@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using System;
+using AmongUs.GameOptions;
 using BetterOtherRoles;
 using BetterOtherRoles.CustomGameModes;
 using BetterOtherRoles.Modules;
@@ -35,8 +36,9 @@ namespace BetterOtherRoles.Patches
 
             static void Postfix(PingTracker __instance)
             {
-                __instance.text.alignment = TextAlignmentOptions.TopRight;
+                __instance.text.alignment = TextAlignmentOptions.Top;
                 var position = __instance.GetComponent<AspectPosition>();
+                position.Alignment = AspectPosition.EdgeAlignments.Top;
                 if (AmongUsClient.Instance.GameState == InnerNet.InnerNetClient.GameStates.Started)
                 {
                     string gameModeText = $"";
@@ -56,10 +58,25 @@ namespace BetterOtherRoles.Patches
                     if (TORMapOptions.gameMode == CustomGamemodes.HideNSeek) gameModeText = $"Hide 'N Seek";
                     else if (TORMapOptions.gameMode == CustomGamemodes.Guesser) gameModeText = $"Guesser";
                     else if (TORMapOptions.gameMode == CustomGamemodes.PropHunt) gameModeText = $"Prop Hunt";
-                    if (gameModeText != "") gameModeText = Helpers.cs(Color.yellow, gameModeText) + "\n";
+                    if (gameModeText != "") gameModeText = Helpers.cs(Color.yellow, gameModeText);
 
                     __instance.text.text = $"{fullCredentialsVersion}\n  {gameModeText + fullCredentials}\n<size=70%>{__instance.text.text}</size>";
-                    position.DistanceFromEdge = new Vector3(3.5f, 0.1f, 0);
+                    position.DistanceFromEdge = new Vector3(0f, 0.1f, 0);
+
+                    try
+                    {
+                        var GameModeText = GameObject.Find("GameModeText")?.GetComponent<TextMeshPro>();
+                        GameModeText.text = gameModeText == ""
+                            ? (GameOptionsManager.Instance.currentGameOptions.GameMode == GameModes.HideNSeek
+                                ? "Van. HideNSeek"
+                                : "Classic")
+                            : gameModeText;
+                        var ModeLabel = GameObject.Find("ModeLabel")?.GetComponentInChildren<TextMeshPro>();
+                        ModeLabel.text = "Game Mode";
+                    }
+                    catch
+                    {
+                    }
                 }
                 position.AdjustPosition();
             }

@@ -23,6 +23,7 @@ using AmongUs.Data;
 using BetterOtherRoles.Modules.CustomHats;
 using BetterOtherRoles.UI;
 using BetterOtherRoles.Utilities.Attributes;
+using InnerNet;
 using UnityEngine.IO;
 using File = System.IO.File;
 
@@ -35,8 +36,8 @@ namespace BetterOtherRoles
     {
         public const string Name = "Better Other Roles";
         public const string Id = "betterohterroles.eno.pm";
-        public const string VersionString = "1.6.4";
-        public const int betaNum = 0;
+        public const string VersionString = "1.7.0";
+        public const int betaNum = 1;
         
         public static Version Version = Version.Parse(VersionString);
         internal static BepInEx.Logging.ManualLogSource Logger;
@@ -56,8 +57,9 @@ namespace BetterOtherRoles
         public static ConfigEntry<bool> EnableSoundEffects { get; set; }
         public static ConfigEntry<bool> EnableHorseMode { get; set; }
         public static ConfigEntry<bool> ShowVentsOnMap { get; set; }
-        public static ConfigEntry<bool> GetBetaReleases { get; set; }
+        public static ConfigEntry<bool> ShowChatNotifications { get; set; }
         public static ConfigEntry<string> ShowPopUpVersion { get; set; }
+        public static ConfigEntry<bool> GetBetaReleases { get; set; }
 
         public override void Load() {
             Logger = Log;
@@ -74,7 +76,11 @@ namespace BetterOtherRoles
             EnableHorseMode = Config.Bind("Custom", "Enable Horse Mode", false);
             ShowPopUpVersion = Config.Bind("Custom", "Show PopUp", "0");
             ShowVentsOnMap = Config.Bind("Custom", "Show vent positions on minimap", true);
+            ShowChatNotifications = Config.Bind("Custom", "Show Chat Notifications", true);
             GetBetaReleases = Config.Bind("Custom", "Get Beta Releases", false);
+            
+            //TODO: Verifier que ça supprime effectivement les regions
+            ServerManager.DefaultRegions = new Il2CppReferenceArray<IRegionInfo>(Array.Empty<IRegionInfo>());
 
             DebugMode = Config.Bind("Custom", "Enable Debug Mode", "false");
             
@@ -139,12 +145,12 @@ namespace BetterOtherRoles
 
 
             // Spawn dummys
-            if (Input.GetKeyDown(KeyCode.F)) {
+            /*if (Input.GetKeyDown(KeyCode.F)) {
                 var playerControl = UnityEngine.Object.Instantiate(AmongUsClient.Instance.PlayerPrefab);
                 var i = playerControl.PlayerId = (byte) GameData.Instance.GetAvailableId();
 
                 bots.Add(playerControl);
-                GameData.Instance.AddPlayer(playerControl);
+                GameData.Instance.AddPlayer(playerControl, new InnerNet.ClientData(0));
                 AmongUsClient.Instance.Spawn(playerControl, -2, InnerNet.SpawnFlags.None);
                 
                 playerControl.transform.position = CachedPlayer.LocalPlayer.transform.position;
@@ -152,8 +158,8 @@ namespace BetterOtherRoles
                 playerControl.NetTransform.enabled = false;
                 playerControl.SetName(RandomString(10));
                 playerControl.SetColor((byte) random.Next(Palette.PlayerColors.Length));
-                GameData.Instance.RpcSetTasks(playerControl.PlayerId, Array.Empty<byte>());
-            }
+                playerControl.Data.RpcSetTasks(Array.Empty<byte>());
+            }*/
 
             // Terminate round
             if(Input.GetKeyDown(KeyCode.L)) {

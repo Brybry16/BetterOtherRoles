@@ -27,7 +27,6 @@ public class Silhouette
     {
         if (duration <= 0f)
         {
-            BetterOtherRolesPlugin.Logger.LogMessage("silhouette: permanent!");
             permanent = true;
         }
 
@@ -77,8 +76,6 @@ public class Silhouette
 
             if (current.timeRemaining < 0 && !current.permanent)
             {
-                BetterOtherRolesPlugin.Logger.LogMessage(
-                    $"update: permanent: {current.permanent}, time: {current.timeRemaining}");
                 current.gameObject.SetActive(false);
                 UnityEngine.Object.Destroy(current.gameObject);
                 silhouettes.Remove(current);

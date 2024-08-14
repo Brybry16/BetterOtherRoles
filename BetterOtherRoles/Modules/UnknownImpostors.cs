@@ -20,7 +20,7 @@ public static class UnknownImpostors
     public static bool IsHostDingusRelease = AmongUsClient.Instance && AmongUsClient.Instance.AmHost && DevConfig.
         IsDingusRelease;
     
-    public static GameData.PlayerInfo lastExiled;
+    public static NetworkedPlayerInfo lastExiled;
     
     // public static DateTime prankexStartTime = new(2024, 8, 6, 20, 20, 0, DateTimeKind.Utc);
     // public static DateTime prankexEndTime = new(2024, 8, 7, 5, 0, 0, DateTimeKind.Utc);

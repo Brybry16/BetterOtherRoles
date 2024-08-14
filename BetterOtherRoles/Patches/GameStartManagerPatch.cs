@@ -24,6 +24,8 @@ namespace BetterOtherRoles.Patches {
                 if (CachedPlayer.LocalPlayer != null) {
                     VersionHandshake.Instance.Share();
                 }
+
+                GameStartManagerUpdatePatch.sendGamemode = true;
             }
         }
 
@@ -50,6 +52,7 @@ namespace BetterOtherRoles.Patches {
             private static bool update = false;
             private static string currentText = "";
             private static GameObject copiedStartButton;
+            public static bool sendGamemode = true;
         
             public static void Prefix(GameStartManager __instance) {
                 if (!GameData.Instance ) return; // No instance
@@ -60,7 +63,7 @@ namespace BetterOtherRoles.Patches {
                 {
                     if (AmongUsClient.Instance.AmHost)
                     {
-                        __instance.startLabelText.text = "Stop";
+                        __instance.StartButton.buttonText.text = "Stop";
                         var pos = __instance.GameStartText.transform.localPosition;
                         pos.y = 0.6f;
                         __instance.GameStartText.transform.localPosition = pos;
@@ -69,7 +72,7 @@ namespace BetterOtherRoles.Patches {
                 }
                 else if (__instance.startState == GameStartManager.StartingStates.NotStarting)
                 {
-                    __instance.startLabelText.text =
+                    __instance.StartButton.buttonText.text =
                         DestroyableSingleton<TranslationController>.Instance.GetString(StringNames.StartLabel);
                 }
             }
@@ -94,11 +97,10 @@ namespace BetterOtherRoles.Patches {
                         // Activate Stop-Button
                         copiedStartButton = GameObject.Instantiate(__instance.StartButton.gameObject, __instance.StartButton.gameObject.transform.parent);
                         copiedStartButton.transform.localPosition = __instance.StartButton.transform.localPosition;
-                        copiedStartButton.GetComponent<SpriteRenderer>().sprite = Helpers.loadSpriteFromResources("BetterOtherRoles.Resources.StopClean.png", 180f);
                         copiedStartButton.SetActive(true);
                         
                         var startButtonText = copiedStartButton.GetComponentInChildren<TMPro.TextMeshPro>();
-                        startButtonText.text = "STOP";
+                        startButtonText.text = "";
                         startButtonText.fontSize *= 0.8f;
                         startButtonText.fontSizeMax = startButtonText.fontSize;
                         startButtonText.gameObject.transform.localPosition = Vector3.zero;
@@ -118,12 +120,9 @@ namespace BetterOtherRoles.Patches {
                         
                         startButtonPassiveButton.OnClick.AddListener((Action)(() => StopStartFunc()));
                         __instance.StartCoroutine(Effects.Lerp(.1f, new System.Action<float>((p) => {
-                            startButtonText.text = "STOP";
+                            startButtonText.text = "";
                         })));
                     }
-                    
-                    if (__instance.GameStartText.text.StartsWith("Starting") && CustomOptionHolder.anyPlayerCanStopStart.getBool())
-                        __instance.GameStartText.transform.localPosition = __instance.StartButton.transform.localPosition + Vector3.up * 0.6f;
                 }
                 
                 // Start Timer
@@ -131,7 +130,7 @@ namespace BetterOtherRoles.Patches {
                     startingTimer -= Time.deltaTime;
                 }
                 // Lobby timer
-                if (!GameData.Instance) return; // No instance
+                if (!GameData.Instance || !__instance.PlayerCounter) return; // No instance
 
                 if (update) currentText = __instance.PlayerCounter.text;
 
@@ -140,14 +139,14 @@ namespace BetterOtherRoles.Patches {
                 int seconds = (int)timer % 60;
                 string suffix = $" ({minutes:00}:{seconds:00})";
 
-                __instance.PlayerCounter.text = currentText + suffix;
-                __instance.PlayerCounter.autoSizeTextContainer = true;
+                if (!AmongUsClient.Instance) return;
 
-                if (AmongUsClient.Instance.AmHost) {
+                if (AmongUsClient.Instance.AmHost && sendGamemode && CachedPlayer.LocalPlayer != null) {
                     MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.ShareGamemode, Hazel.SendOption.Reliable, -1);
                     writer.Write((byte) TORMapOptions.gameMode);
                     AmongUsClient.Instance.FinishRpcImmediately(writer);
                     RPCProcedure.shareGamemode((byte) TORMapOptions.gameMode);
+                    sendGamemode = false;
                 }
             }
         }
@@ -201,13 +200,15 @@ namespace BetterOtherRoles.Patches {
                         // 4 = Airship
                         // 5 = Submerged
                         byte chosenMapId = 0;
-                        List<float> probabilities = new List<float>();
-                        probabilities.Add(CustomOptionHolder.dynamicMapEnableSkeld.getFloat() / 100f);
-                        probabilities.Add(CustomOptionHolder.dynamicMapEnableMira.getFloat() / 100f);
-                        probabilities.Add(CustomOptionHolder.dynamicMapEnablePolus.getFloat() / 100f);
-                        probabilities.Add(CustomOptionHolder.dynamicMapEnableAirShip.getFloat() / 100f);
-                        probabilities.Add(CustomOptionHolder.dynamicMapEnableFungle.getFloat() / 100f);
-                        probabilities.Add(CustomOptionHolder.dynamicMapEnableSubmerged.getFloat() / 100f);
+                        List<float> probabilities = new List<float>()
+                        {
+                            CustomOptionHolder.dynamicMapEnableSkeld.getSelection() / 10f,
+                            CustomOptionHolder.dynamicMapEnableMira.getSelection() / 10f,
+                            CustomOptionHolder.dynamicMapEnablePolus.getSelection() / 10f,
+                            CustomOptionHolder.dynamicMapEnableAirShip.getSelection() / 10f,
+                            CustomOptionHolder.dynamicMapEnableFungle.getSelection() / 10f,
+                            CustomOptionHolder.dynamicMapEnableSubmerged.getSelection() / 10f,
+                        };
 
                         // if any map is at 100%, remove all maps that are not!
                         if (probabilities.Contains(1.0f)) {
