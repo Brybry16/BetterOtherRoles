@@ -37,10 +37,10 @@ Even more roles are coming soon. :)
 The [Role Assignment](#role-assignment) sections explains how the roles are being distributed among the players.
 
 # Releases
-| Among Us - Version | Mod Version | Link |
-|--------------------|-------------|-----------------|
-| 2024.6.18          | v1.7.0      | [Download](https://github.com/Brybry16/BetterOtherRoles/releases/download/v1.6.0/BetterOtherRoles.v1.7.0.zip)
-| 2024.3.5           | v1.6.0      | [Download](https://github.com/Brybry16/BetterOtherRoles/releases/download/v1.6.0/BetterOtherRoles.v1.6.0.zip)
+| Among Us - Version | Mod Version   | Link |
+|--------------------|---------------|-----------------|
+| 2024.6.18          | v1.7.0 (beta) | [Download](https://github.com/Brybry16/BetterOtherRoles/releases/download/v1.7.0-beta/BetterOtherRoles.v1.7.0.zip)
+| 2024.3.5           | v1.6.0        | [Download](https://github.com/Brybry16/BetterOtherRoles/releases/download/v1.6.0/BetterOtherRoles.v1.6.0.zip)
 
 <details>
   <summary>Click to show older versions</summary>
