@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,6 +10,8 @@ using BetterOtherRoles.UI;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
+using IntPtr = System.IntPtr;
+using Version = System.Version;
 
 namespace BetterOtherRoles.Eno;
 
@@ -22,7 +23,7 @@ public class PluginUpdater : MonoBehaviour
     
     public PluginUpdater(IntPtr ptr) : base(ptr) { }
     
-    private bool _busy;
+    public bool _busy;
     public List<GithubRelease> Releases;
 
     public void Awake()
@@ -82,7 +83,7 @@ public class PluginUpdater : MonoBehaviour
     }
 
     [HideFromIl2Cpp]
-    private IEnumerator CoCheckForUpdate()
+    public IEnumerator CoCheckForUpdate(bool refresh = false)
     {
         _busy = true;
         SetLoadingText("Checking for updates");
@@ -109,7 +110,7 @@ public class PluginUpdater : MonoBehaviour
         www.Dispose();
         Releases.Sort(SortReleases);
         var latestRelease = Releases.FirstOrDefault();
-        if (latestRelease != null && (latestRelease.Version != BetterOtherRolesPlugin.Version || BetterOtherRolesPlugin.betaNum > 0))
+        if (!refresh && latestRelease != null && (latestRelease.Version != BetterOtherRolesPlugin.Version || BetterOtherRolesPlugin.betaNum > 0))
         {
             UIManager.UpdatePluginPanel?.RefreshDropdown(latestRelease);
             UIManager.UpdatePluginPanel?.SetActive(true);
@@ -232,7 +233,9 @@ public class GithubRelease
     [JsonPropertyName("assets")]
     public List<GithubAsset> Assets { get; set; }
 
-    public Version Version => Version.Parse(Tag.Replace("v", string.Empty));
+    public Version Version => Version.Parse(Tag[..(Tag.IndexOf('-') > -1 ? Tag.IndexOf('-') + 1 : Tag.Length)]
+        .Replace("-", string.Empty)
+        .Replace("v", string.Empty));
 
     public bool IsNewer(Version version)
     {

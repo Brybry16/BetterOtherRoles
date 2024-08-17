@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using BepInEx.Unity.IL2CPP.Utils;
+using BetterOtherRoles.Eno;
 using BetterOtherRoles.Modules;
 using BetterOtherRoles.UI.Components;
 using UnityEngine;
@@ -109,6 +111,8 @@ public class LocalOptionsPanel : WrappedPanel
         getBetaReleases.OnUpdated += value =>
         {
             TORMapOptions.getBetaReleases = value;
+            if (PluginUpdater.Instance._busy) return;
+            PluginUpdater.Instance.StartCoroutine(PluginUpdater.Instance.CoCheckForUpdate(true));
         };
     }
     

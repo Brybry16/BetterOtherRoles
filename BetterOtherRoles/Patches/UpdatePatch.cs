@@ -165,8 +165,8 @@ namespace BetterOtherRoles.Patches {
                 }
             }
 
-            // No else if here, as the Impostors need the Spy name to be colored
-            if (Spy.spy != null && localPlayer.Data.Role.IsImpostor) {
+            // No else if here, as the Impostors need the Spy name to be colored (except when other impostors are unknown)
+            if (Spy.spy != null && localPlayer.Data.Role.IsImpostor && !UnknownImpostors.IsOtherImpostorUnknown) {
                 setPlayerNameColor(Spy.spy, Spy.color);
             }
             if (Sidekick.sidekick != null && Sidekick.wasTeamRed && localPlayer.Data.Role.IsImpostor) {

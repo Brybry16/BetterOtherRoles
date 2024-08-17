@@ -37,10 +37,11 @@ namespace BetterOtherRoles {
             int CompletedTasks = 0;
             if (!playerInfo.Disconnected && playerInfo.Tasks != null &&
                 playerInfo.Object &&
-                playerInfo.Role)
+                playerInfo.Role && (playerInfo.Role.TasksCountTowardProgress || playerInfo.Role.IsImpostor) &&
+                !playerInfo.Object.hasFakeTasks())
             {
                 TotalTasks = playerInfo.Tasks.Count;
-                // 1 task par joueur toutes les 23 secondes environ (la moyenne est de 23.63 secondes par task)
+                // 1 task par joueur toutes les 23 secondes environ (la moyenne est de 27 secondes par task)
                 CompletedTasks += Mathf.Clamp((int) Math.Floor(UnknownImpostors.getElapsedTime().TotalSeconds/23.0), 0, TotalTasks);
             }
 

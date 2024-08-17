@@ -128,7 +128,7 @@ public class UpdatePluginPanel : WrappedPanel
         if (_selectedRelease == null) return;
         var isCompatible = _selectedRelease.Version.Major == BetterOtherRolesPlugin.Version.Major && _selectedRelease.Version.Minor == BetterOtherRolesPlugin.Version.Minor;
         var isUpgrade = _selectedRelease.IsNewer(BetterOtherRolesPlugin.Version);
-        var isReinstall = !isUpgrade && _selectedRelease.Version == BetterOtherRolesPlugin.Version;
+        var isReinstall = !isUpgrade && _selectedRelease.Version == BetterOtherRolesPlugin.Version && BetterOtherRolesPlugin.betaNum > 0 && _selectedRelease.Tag.EndsWith($"beta{BetterOtherRolesPlugin.betaNum}");
         var updateType = isUpgrade ? "Upgrade" : isReinstall ? "Reinstall" : "Downgrade";
         var updateTypeColor = isUpgrade ? Color.green : isReinstall ? UIPalette.Info : UIPalette.Warning;
         var updateTypeArrow = isUpgrade ? "\u25b2" : isReinstall ? "=" : "\u25bc";
@@ -173,7 +173,7 @@ public class UpdatePluginPanel : WrappedPanel
             {
                 var isLatest = latestRelease?.Id == release.Id;
                 var isCompatible = release.Version.Major == BetterOtherRolesPlugin.Version.Major && release.Version.Minor == BetterOtherRolesPlugin.Version.Minor;
-                var isCurrent = release.Version == BetterOtherRolesPlugin.Version;
+                var isCurrent = release.Version == BetterOtherRolesPlugin.Version && BetterOtherRolesPlugin.betaNum > 0 && release.Tag.EndsWith($"beta{BetterOtherRolesPlugin.betaNum}");
                 var isNewer = release.IsNewer(BetterOtherRolesPlugin.Version);
                 var color = isCurrent ? UIPalette.Info : !isCompatible ? Color.red : isNewer ? Color.green : UIPalette.Warning;
                 var text = release.Tag;

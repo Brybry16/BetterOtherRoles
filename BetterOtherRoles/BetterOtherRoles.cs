@@ -538,13 +538,15 @@ namespace BetterOtherRoles
         }
 
         public static bool existingWithKiller() {
-            return existing() && (lover1 == Jackal.jackal     || lover2 == Jackal.jackal
+                              // To avoid NullReferenceException  
+            return existing() && lover1.Data.Role && lover2.Data.Role
+                              && (lover1 == Jackal.jackal     || lover2 == Jackal.jackal
                                || lover1 == Sidekick.sidekick || lover2 == Sidekick.sidekick
                                || lover1.Data.Role.IsImpostor || lover2.Data.Role.IsImpostor);
         }
 
         public static bool hasAliveKillingLover(this PlayerControl player) {
-            if (!Lovers.existingAndAlive() || !existingWithKiller())
+            if (!Lovers.existingAndAlive() || !Lovers.existingWithKiller())
                 return false;
             return (player != null && (player == lover1 || player == lover2));
         }

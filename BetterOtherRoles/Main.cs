@@ -37,7 +37,7 @@ namespace BetterOtherRoles
         public const string Name = "Better Other Roles";
         public const string Id = "betterohterroles.eno.pm";
         public const string VersionString = "1.7.0";
-        public const int betaNum = 1;
+        public const int betaNum = 2;
         
         public static Version Version = Version.Parse(VersionString);
         internal static BepInEx.Logging.ManualLogSource Logger;
@@ -79,10 +79,11 @@ namespace BetterOtherRoles
             ShowChatNotifications = Config.Bind("Custom", "Show Chat Notifications", true);
             GetBetaReleases = Config.Bind("Custom", "Get Beta Releases", false);
             
-            //TODO: Verifier que ça supprime effectivement les regions
             ServerManager.DefaultRegions = new Il2CppReferenceArray<IRegionInfo>(Array.Empty<IRegionInfo>());
 
             DebugMode = Config.Bind("Custom", "Enable Debug Mode", "false");
+
+            TORMapOptions.reloadPluginOptions();
             
             if(Directory.GetFiles(Paths.PluginPath, "UniverseLib*", SearchOption.AllDirectories).FirstOrDefault() == null)
             {
