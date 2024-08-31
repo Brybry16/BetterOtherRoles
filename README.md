@@ -62,6 +62,7 @@ The [Role Assignment](#role-assignment) sections explains how the roles are bein
 - Fixed Sticky Bomb not exploding when using transportation
 - Fixed Sticky Bomb not exploding on meeting start when holder is using a transportation
 - Fixed Swapper being unable to complete TuneRadio Task in Fungle
+- Fixed Kill not working when target has the "ladder bug"
 
 **Version 1.5.x**
 - Updated to Among Us version 2023.10.24

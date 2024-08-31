@@ -12,7 +12,8 @@ namespace BetterOtherRoles.Patches {
          */
        
         public static bool isUsingTransportation(PlayerControl pc) {
-            return pc.inMovingPlat || pc.onLadder;
+            return (pc.inMovingPlat || pc.onLadder)
+                   && !pc.moveable; // To fix an issue where the player is considered on a transportation when they're not.
         }
 
         // Zipline:

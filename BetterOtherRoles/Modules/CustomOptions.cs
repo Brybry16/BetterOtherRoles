@@ -1533,16 +1533,9 @@ public class AddToKillDistanceSetting
 
     public static void Prefix(ref StringNames stringName, ref string value)
     {
-        if (stringName == StringNames.GameKillDistance) {
-            int index;
-            if (GameOptionsManager.Instance.currentGameMode == GameModes.Normal) {
-                index = GameOptionsManager.Instance.currentNormalGameOptions.KillDistance;
-            }
-            else {
-                index = GameOptionsManager.Instance.currentHideNSeekGameOptions.KillDistance;
-            }
-            value = GameOptionsData.KillDistanceStrings[index];
-        }
+        if (stringName != StringNames.GameKillDistance) return;
+        var index = GameOptionsManager.Instance.currentGameMode == GameModes.Normal ? GameOptionsManager.Instance.currentNormalGameOptions.KillDistance : GameOptionsManager.Instance.currentHideNSeekGameOptions.KillDistance;
+        value = GameOptionsData.KillDistanceStrings[index];
     }
 
     [HarmonyPatch(typeof(TranslationController), nameof(TranslationController.GetString),
